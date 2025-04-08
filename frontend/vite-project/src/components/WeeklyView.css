@@ -46,7 +46,7 @@
 .time-cell,
 .day-cell {
   position: relative;
-  height: 36px;
+  height: 28px;
   border-bottom: 1px solid #eee;
   border-right: 1px solid #eee;
   padding: 0;

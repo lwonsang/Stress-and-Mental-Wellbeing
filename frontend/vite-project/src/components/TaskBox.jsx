@@ -7,7 +7,7 @@ const TaskBox = ({ task, onClick }) => {
   };
 
   const hours = parseFloat(task.workTime);
-  const height = `${36 * hours - 4}px`;
+  const height = `${28 * hours - 4}px`;
 
   return (
     <div

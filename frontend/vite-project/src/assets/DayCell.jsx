@@ -10,7 +10,7 @@ export function DayCell({ dayNumber, events = [] }) {
       shadow="xs"
       style={{
         aspectRatio: '1.707',
-        backgroundColor: 'rgba(0, 85, 255, 0.44)', // #0055FF at 44% opacity
+        backgroundColor: 'rgba(0, 85, 255, 0.44)', 
         position: 'relative',
         overflow: 'hidden',
         padding: '8px',
@@ -22,7 +22,14 @@ export function DayCell({ dayNumber, events = [] }) {
       onMouseLeave={() => setHovered(false)}
     >
       {/* Date in corner */}
-      <Text size="lg" weight={700} style={{ position: 'absolute', top: 8, left: 8 }}>
+      <Text
+        style={{
+          fontSize: '1.5vw', // scales with screen width
+          position: 'absolute',
+          top: 8,
+          left: 8,
+        }}
+      >
         {String(dayNumber).padStart(2, '0')}
       </Text>
 
@@ -43,7 +50,7 @@ export function DayCell({ dayNumber, events = [] }) {
             key={idx}
             size="sm"
             lineClamp={1}
-            style={{ color: e.highlight ? 'red' : 'black' }}
+            style={{ color: e.highlight ? 'red' : 'black', fontSize: '1.2vw'}}
           >
             {e.text}
           </Text>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Grid, Text } from '@mantine/core';
+import { Box, Grid, Text } from '@mantine/core';
 import { DayCell } from './DayCell';
 import { MonthSwitcher } from './Monthswitch';
 
@@ -57,21 +57,23 @@ export default function Calendar() {
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      <div style={{ padding: 16 }}>
-        <Grid columns={7} gutter="xs">
-          {daysOfWeek.map((day) => (
-            <Grid.Col span={1} key={day}>
-              <Text align="center" fw={700}>
-                {day}
-              </Text>
-            </Grid.Col>
-          ))}
-        </Grid>
-        
-        <Grid columns={7} gutter="xs">
-          {getCalendarCells()}
-        </Grid>
-      </div>
+      <Box style={{ width: '100%', padding: '1rem' }}>
+        <div style={{ padding: 16 }}>
+          <Grid columns={7} gutter="xs">
+            {daysOfWeek.map((day) => (
+              <Grid.Col span={1} key={day}>
+                <Text align="center" fw={700}>
+                  {day}
+                </Text>
+              </Grid.Col>
+            ))}
+          </Grid>
+          
+          <Grid columns={7} gutter="xs">
+            {getCalendarCells()}
+          </Grid>
+        </div>
+      </Box>
     </>
   );
 }

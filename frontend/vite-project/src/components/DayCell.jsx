@@ -1,8 +1,10 @@
 import { Paper, Text, Button } from '@mantine/core';
 import { useState } from 'react';
+import TaskBox from "./TaskBox";
 
 export function DayCell({ dayNumber, events = [] }) {
   const [hovered, setHovered] = useState(false);
+  const [showTaskBox, setShowTaskBox] = useState(false);
 
   return (
     <Paper
@@ -21,7 +23,6 @@ export function DayCell({ dayNumber, events = [] }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Date in corner */}
       <Text
         style={{
           fontSize: '1.5vw', // scales with screen width
@@ -32,8 +33,7 @@ export function DayCell({ dayNumber, events = [] }) {
       >
         {String(dayNumber).padStart(2, '0')}
       </Text>
-
-      {/* Event preview */}
+      
       <div
         style={{
           flex: 1,
@@ -56,8 +56,7 @@ export function DayCell({ dayNumber, events = [] }) {
           </Text>
         ))}
       </div>
-
-      {/* Hover button */}
+      
       {hovered && (
         <div
           style={{
@@ -67,9 +66,15 @@ export function DayCell({ dayNumber, events = [] }) {
             transform: 'translateX(-50%)',
           }}
         >
-          <Button size="xs" variant="white">
+          <Button size="xs" variant="white" onClick={() => setShowTaskBox(true)}>
             Add
           </Button>
+        </div>
+      )}
+
+      {showTaskBox && (
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+          <TaskBox onClose={() => setShowTaskBox(false)} />
         </div>
       )}
     </Paper>

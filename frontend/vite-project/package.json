@@ -11,8 +11,14 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mantine/core": "^7.17.3",
     "@mantine/hooks": "^7.17.3",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
+    "@mui/x-date-pickers": "^7.28.3",
+    "dayjs": "^1.11.13",
     "react": "^19.0.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^19.0.0"

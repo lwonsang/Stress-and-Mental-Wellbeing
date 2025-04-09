@@ -2,6 +2,10 @@
 import "./WeeklyView.css";
 import TaskBox from "./TaskBox";
 import WeeklyTaskPanel from "./WeeklyTaskPanel";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 const WeeklyPage = () => {
   const [tasks, setTasks] = useState([
@@ -163,14 +167,43 @@ const WeeklyPage = () => {
               }
             />
 
-            <label>Due Time:</label>
-            <input
-              type="time"
-              value={selectedTask.dueTime}
-              onChange={(e) =>
-                setSelectedTask({ ...selectedTask, dueTime: e.target.value })
-              }
-            />
+<label>Due Time:</label>
+<LocalizationProvider dateAdapter={AdapterDayjs}>
+  <TimePicker
+    ampm={false}
+    value={
+      selectedTask.dueTime
+        ? dayjs(`2025-01-01T${selectedTask.dueTime}`)
+        : null
+    }
+    onChange={(value) =>
+      setSelectedTask({
+        ...selectedTask,
+        dueTime: value ? value.format("HH:mm") : "",
+      })
+    }
+    slotProps={{
+      textField: {
+        variant: "standard",
+        InputProps: {
+          style: {
+            backgroundColor: "white",
+            borderRadius: "6px",
+            padding: "8px 12px",
+            fontSize: "1rem",
+            border: "1px solid #ccc",
+          },
+        },
+        InputLabelProps: { shrink: true },
+      },
+    }}
+    sx={{
+      width: "100%",
+      marginTop: "4px",
+    }}
+  />
+</LocalizationProvider>
+
 
             <div className="modal-buttons">
               <button

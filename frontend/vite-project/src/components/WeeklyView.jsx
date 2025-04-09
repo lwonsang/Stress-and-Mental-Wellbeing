@@ -17,23 +17,25 @@ const WeeklyPage = ({ goHome }) => {
       : [
           {
             id: "t1",
-            name: "Team Meeting",
-            duration: "1h",
-            workTime: "3h",
-            dueDate: "2025-03-31",
+            name: "Learning",
+            duration: "3h",
+            workTime: "1h",
+            dueDate: "2025-04-30",
             dueTime: "10:00",
-            date: "2025-04-07",
-            time: "10:00",
+            slots: [
+              { date: "2025-04-07", time: "10:00" },
+              { date: "2025-04-08", time: "10:00" },
+              { date: "2025-04-09", time: "10:00" },
+            ],
           },
           {
             id: "t2",
             name: "Workout",
             duration: "1h",
             workTime: "1h",
-            dueDate: "2025-04-02",
+            dueDate: "2025-04-10",
             dueTime: "18:00",
-            date: "2025-04-09",
-            time: "18:00",
+            slots: [{ date: "2025-04-09", time: "18:00" }],
           },
         ];
   });
@@ -48,6 +50,87 @@ const WeeklyPage = ({ goHome }) => {
       options.push(`${i}h`);
     }
     return options;
+  };
+
+  const generateSchedule = () => {
+    const hours = Array.from(
+      { length: 16 },
+      (_, i) => `${(i + 6).toString().padStart(2, "0")}:00`
+    );
+
+    const morning = hours.slice(0, 5);
+    const midday = hours.slice(5, 10);
+    const evening = hours.slice(10);
+
+    const mixedHours = [
+      ...morning.sort(() => Math.random() - 0.5),
+      ...midday.sort(() => Math.random() - 0.5),
+      ...evening.sort(() => Math.random() - 0.5),
+    ].sort(() => Math.random() - 0.5);
+
+    const dayOrder = Array.from({ length: 7 }, (_, i) => i).sort(
+      () => Math.random() - 0.5
+    );
+
+    const now = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+
+    const used = new Set();
+    tasks.forEach((t) =>
+      t.slots?.forEach((s) => {
+        const hour = parseInt(s.time.split(":")[0], 10);
+        used.add(`${s.date}-${hour.toString().padStart(2, "0")}:00`);
+        used.add(`${s.date}-${(hour + 1).toString().padStart(2, "0")}:00`);
+      })
+    );
+
+    const newTasks = tasks.map((task) => {
+      if (task.slots && task.slots.length > 0) return task;
+
+      const total = parseFloat(task.duration);
+      const unit = parseFloat(task.workTime);
+      if (!total || !unit) return task;
+
+      const needed = Math.ceil(total / unit);
+      const newSlots = [];
+      let filled = 0;
+      let offset = 0;
+
+      const due = new Date(`${task.dueDate}T${task.dueTime || "23:59"}`);
+
+      while (filled < needed && offset < 14) {
+        for (let time of mixedHours) {
+          for (let d of dayOrder) {
+            const day = new Date(startDate);
+            day.setDate(startDate.getDate() + ((d + offset) % 7));
+            const dateStr = day.toISOString().split("T")[0];
+            const slotDateTime = new Date(`${dateStr}T${time}`);
+
+            const hour = parseInt(time.split(":")[0], 10);
+            const hourBlock = [
+              `${hour.toString().padStart(2, "0")}:00`,
+              `${(hour + 1).toString().padStart(2, "0")}:00`,
+            ];
+            const blockKeys = hourBlock.map((t) => `${dateStr}-${t}`);
+            const blockUsed = blockKeys.some((k) => used.has(k));
+
+            if (slotDateTime > due || slotDateTime < now || blockUsed) continue;
+
+            blockKeys.forEach((k) => used.add(k));
+            newSlots.push({ date: dateStr, time });
+            filled++;
+            if (filled >= needed) break;
+          }
+          if (filled >= needed) break;
+        }
+        offset++;
+      }
+
+      return { ...task, slots: newSlots };
+    });
+
+    setTasks(newTasks);
   };
 
   const [selectedTask, setSelectedTask] = useState(null);
@@ -71,6 +154,7 @@ const WeeklyPage = ({ goHome }) => {
           setSelectedTask={setSelectedTask}
           setShowModal={setShowModal}
           setIsEditing={setIsEditing}
+          generateSchedule={generateSchedule}
         />
 
         {showModal && selectedTask && (
@@ -88,10 +172,12 @@ const WeeklyPage = ({ goHome }) => {
                 {selectedTask.dueTime}
               </p>
               <p>
-                <strong>Date:</strong> {selectedTask.date}
+                <strong>Date:</strong>{" "}
+                {selectedTask.selectedSlot?.date || "N/A"}
               </p>
               <p>
-                <strong>Time Slot:</strong> {selectedTask.time}
+                <strong>Time Slot:</strong>{" "}
+                {selectedTask.selectedSlot?.time || "N/A"}
               </p>
 
               <div className="modal-buttons">
@@ -104,9 +190,6 @@ const WeeklyPage = ({ goHome }) => {
                 >
                   Close
                 </button>{" "}
-                <button className="edit-btn" onClick={() => setIsEditing(true)}>
-                  Edit
-                </button>
               </div>
             </div>
           </div>
@@ -241,16 +324,45 @@ const WeeklyPage = ({ goHome }) => {
                 <button
                   className="modal-button submit-btn"
                   onClick={() => {
+                    const { name, duration, workTime, dueDate, dueTime } =
+                      selectedTask;
+
+                    if (
+                      !name ||
+                      !duration ||
+                      !workTime ||
+                      !dueDate ||
+                      !dueTime
+                    ) {
+                      alert("Please fill out all fields before submitting.");
+                      return;
+                    }
+
                     const exists = tasks.some((t) => t.id === selectedTask.id);
                     if (exists) {
                       setTasks((prev) =>
-                        prev.map((t) =>
-                          t.id === selectedTask.id ? selectedTask : t
-                        )
+                        prev.map((t) => {
+                          if (t.id !== selectedTask.id) return t;
+
+                          const original = t;
+                          const durationChanged =
+                            original.duration !== selectedTask.duration;
+                          const workTimeChanged =
+                            original.workTime !== selectedTask.workTime;
+
+                          return {
+                            ...selectedTask,
+                            slots:
+                              durationChanged || workTimeChanged
+                                ? []
+                                : original.slots || [],
+                          };
+                        })
                       );
                     } else {
                       setTasks((prev) => [...prev, selectedTask]);
                     }
+
                     setIsEditing(false);
                     setShowModal(false);
                   }}
@@ -327,18 +439,30 @@ const WeeklyView = ({
 
   const handleDrop = (e, targetDateStr, targetTime) => {
     e.preventDefault();
-    const draggedTask = JSON.parse(e.dataTransfer.getData("text/plain"));
+    const data = JSON.parse(e.dataTransfer.getData("application/json"));
+    const { taskId, slot: oldSlot } = data;
+
+    const newSlot = { date: targetDateStr, time: targetTime };
+
     setTasks((prev) =>
-      prev.map((t) =>
-        t.id === draggedTask.id
-          ? { ...t, date: targetDateStr, time: targetTime }
-          : t
-      )
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+
+        const updatedSlots = t.slots
+          .filter((s) => !(s.date === oldSlot.date && s.time === oldSlot.time)) // 删除旧的
+          .concat([newSlot]);
+
+        return { ...t, slots: updatedSlots };
+      })
     );
   };
 
-  const onClickTask = (task) => {
-    setSelectedTask(task);
+  const onClickTask = (task, slot) => {
+    setSelectedTask({
+      ...task,
+      selectedSlot: slot,
+      dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
+    });
     setShowModal(true);
   };
 
@@ -376,9 +500,10 @@ const WeeklyView = ({
                 {dayName}
               </div>
               {hours.map((hour, j) => {
-                const task = tasks.find(
-                  (t) => t.date === dateStr && t.time === hour
+                const tasksInSlot = tasks.filter((t) =>
+                  t.slots?.some((s) => s.date === dateStr && s.time === hour)
                 );
+
                 return (
                   <div
                     key={j}
@@ -386,7 +511,18 @@ const WeeklyView = ({
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleDrop(e, dateStr, hour)}
                   >
-                    {task && <TaskBox task={task} onClick={onClickTask} />}
+                    {tasks.flatMap((task) =>
+                      task.slots
+                        ?.filter((s) => s.date === dateStr && s.time === hour)
+                        .map((slot, idx) => (
+                          <TaskBox
+                            key={`${task.id}-${slot.date}-${slot.time}-${idx}`}
+                            task={task}
+                            slot={slot}
+                            onClick={onClickTask}
+                          />
+                        ))
+                    )}
                   </div>
                 );
               })}

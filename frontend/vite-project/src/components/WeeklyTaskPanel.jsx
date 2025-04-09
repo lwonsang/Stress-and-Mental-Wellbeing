@@ -7,6 +7,7 @@ const WeeklyTaskPanel = ({
   setSelectedTask,
   setShowModal,
   setIsEditing,
+  generateSchedule,
 }) => {
   const draggingItemIndex = useRef(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
@@ -32,7 +33,6 @@ const WeeklyTaskPanel = ({
     setSelectedTask(newTask);
     setIsEditing(true);
     setShowModal(true);
-    //setTasks((prev) => [...prev, newTask]);
   };
 
   const handleDragStart = (index) => {
@@ -42,11 +42,9 @@ const WeeklyTaskPanel = ({
 
   const handleDragEnter = (index) => {
     if (index === draggingItemIndex.current) return;
-
     const updatedTasks = [...tasks];
     const draggedItem = updatedTasks.splice(draggingItemIndex.current, 1)[0];
     updatedTasks.splice(index, 0, draggedItem);
-
     draggingItemIndex.current = index;
     setTasks(updatedTasks);
     setDragOverIndex(index);
@@ -61,6 +59,12 @@ const WeeklyTaskPanel = ({
     <div className="task-panel">
       <div className="task-panel-header">This Week's Tasks</div>
 
+      <div className="task-list-header">
+        <span className="task-index">#</span>
+        <span className="task-name">Name</span>
+        <span className="task-check-label">Planned?</span>
+      </div>
+
       <div className="task-list" onDragOver={(e) => e.preventDefault()}>
         {tasks.map((task, index) => (
           <div
@@ -73,12 +77,25 @@ const WeeklyTaskPanel = ({
             onDragOver={(e) => e.preventDefault()}
           >
             <span className="task-index">{index + 1}</span>
-            <span className="task-icon">⠿</span>
             <span className="task-name">{task.name}</span>
             <span className="task-edit" onClick={() => handleEdit(task)}>
-              edit ✎
+              ✎
             </span>
-            <input type="checkbox" className="task-check" />
+            <span
+              className={`task-check ${
+                task.slots?.length >=
+                parseFloat(task.duration || "0") /
+                  parseFloat(task.workTime || "1")
+                  ? "green-check"
+                  : "red-cross"
+              }`}
+            >
+              {task.slots?.length >=
+              parseFloat(task.duration || "0") /
+                parseFloat(task.workTime || "1")
+                ? "✅"
+                : "❌"}
+            </span>
           </div>
         ))}
       </div>
@@ -87,7 +104,9 @@ const WeeklyTaskPanel = ({
         <span className="todo-placeholder">+ToDo</span>
       </div>
 
-      <button className="generate-btn">Generate Schedule</button>
+      <button className="generate-btn" onClick={generateSchedule}>
+        Generate Schedule
+      </button>
     </div>
   );
 };

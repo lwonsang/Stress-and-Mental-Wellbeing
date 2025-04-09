@@ -75,33 +75,26 @@
   background-color: #a3b9ff;
 }
 
-.task-box {
+.task-box,
+.readonly-task {
   background-color: #3300cc;
   color: white;
-  padding: 2px 4px;
-  font-size: 12px;
-  border-radius: 4px;
-  display: inline-block;
-  margin-top: 4px;
-}
-
-.task-box {
-  position: absolute;
-  top: 0;
-  left: 2px;
-  right: 2px;
-  background-color: #3300cc;
-  color: white;
-  border-radius: 8px;
-  padding: 4px;
   font-size: 12px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  cursor: grab;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  border-radius: 6px;
+
+  box-shadow: none;
+  height: 100%;
+  margin: 0;
 }
 
 .task-modal {
@@ -219,4 +212,9 @@
 .task-modal-content select {
   width: 100%;
   box-sizing: border-box;
+}
+
+.task-check {
+  font-size: 18px;
+  padding-left: 6px;
 }

@@ -213,3 +213,9 @@
   background-color: white;
   font-size: 14px;
 }
+
+.task-modal-content input,
+.task-modal-content select {
+  width: 100%;
+  box-sizing: border-box;
+}

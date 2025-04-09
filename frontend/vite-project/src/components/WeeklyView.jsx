@@ -7,39 +7,41 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import Header from "./Header";
 
-const WeeklyPage = () => {
+const WeeklyPage = ({ goHome }) => {
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
-    return saved ? JSON.parse(saved) : [
-      {
-        id: "t1",
-        name: "Team Meeting",
-        duration: "1h",
-        workTime: "3h",
-        dueDate: "2025-03-31",
-        dueTime: "10:00",
-        date: "2025-04-07",
-        time: "10:00",
-      },
-      {
-        id: "t2",
-        name: "Workout",
-        duration: "1h",
-        workTime: "1h",
-        dueDate: "2025-04-02",
-        dueTime: "18:00",
-        date: "2025-04-09",
-        time: "18:00",
-      },
-    ];
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            id: "t1",
+            name: "Team Meeting",
+            duration: "1h",
+            workTime: "3h",
+            dueDate: "2025-03-31",
+            dueTime: "10:00",
+            date: "2025-04-07",
+            time: "10:00",
+          },
+          {
+            id: "t2",
+            name: "Workout",
+            duration: "1h",
+            workTime: "1h",
+            dueDate: "2025-04-02",
+            dueTime: "18:00",
+            date: "2025-04-09",
+            time: "18:00",
+          },
+        ];
   });
 
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  
   const generateOptions = (max) => {
     const options = [];
     for (let i = 0.5; i <= max; i += 0.5) {
@@ -53,211 +55,214 @@ const WeeklyPage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div className="weekly-layout">
-      <WeeklyView
-        tasks={tasks}
-        setTasks={setTasks}
-        setSelectedTask={setSelectedTask}
-        setShowModal={setShowModal}
-        setIsEditing={setIsEditing}
-      />
-      <WeeklyTaskPanel
-        tasks={tasks}
-        setTasks={setTasks}
-        setSelectedTask={setSelectedTask}
-        setShowModal={setShowModal}
-        setIsEditing={setIsEditing}
-      />
+    <>
+      <Header title="Project Name?" showHome={true} onHomeClick={goHome} />
+      <div className="weekly-layout">
+        <WeeklyView
+          tasks={tasks}
+          setTasks={setTasks}
+          setSelectedTask={setSelectedTask}
+          setShowModal={setShowModal}
+          setIsEditing={setIsEditing}
+        />
+        <WeeklyTaskPanel
+          tasks={tasks}
+          setTasks={setTasks}
+          setSelectedTask={setSelectedTask}
+          setShowModal={setShowModal}
+          setIsEditing={setIsEditing}
+        />
 
-      {showModal && selectedTask && (
-        <div className="task-modal">
-          <div className="task-modal-content">
-            <h3>{selectedTask.name}</h3>
-            <p>
-              <strong>Duration:</strong> {selectedTask.duration}
-            </p>
-            <p>
-              <strong>Work Time:</strong> {selectedTask.workTime}
-            </p>
-            <p>
-              <strong>Due:</strong> {selectedTask.dueDate}{" "}
-              {selectedTask.dueTime}
-            </p>
-            <p>
-              <strong>Date:</strong> {selectedTask.date}
-            </p>
-            <p>
-              <strong>Time Slot:</strong> {selectedTask.time}
-            </p>
+        {showModal && selectedTask && (
+          <div className="task-modal">
+            <div className="task-modal-content">
+              <h3>{selectedTask.name}</h3>
+              <p>
+                <strong>Duration:</strong> {selectedTask.duration}
+              </p>
+              <p>
+                <strong>Work Time:</strong> {selectedTask.workTime}
+              </p>
+              <p>
+                <strong>Due:</strong> {selectedTask.dueDate}{" "}
+                {selectedTask.dueTime}
+              </p>
+              <p>
+                <strong>Date:</strong> {selectedTask.date}
+              </p>
+              <p>
+                <strong>Time Slot:</strong> {selectedTask.time}
+              </p>
 
-            <div className="modal-buttons">
-              <button
-                className="modal-button close-btn"
-                onClick={() => {
-                  setIsEditing(false);
-                  setShowModal(false);
-                }}
-              >
-                Close
-              </button>{" "}
-              <button className="edit-btn" onClick={() => setIsEditing(true)}>
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isEditing && selectedTask && (
-        <div className="task-modal">
-          <div className="task-modal-content">
-            <h3>Edit To-Do</h3>
-            <label>Name:</label>
-            <input
-              value={selectedTask.name}
-              onChange={(e) =>
-                setSelectedTask({ ...selectedTask, name: e.target.value })
-              }
-              placeholder="Insert To-Do name here..."
-            />
-
-            <label>Duration:</label>
-            <select
-              value={selectedTask.duration}
-              onChange={(e) => {
-                const newDuration = e.target.value;
-                setSelectedTask((prev) => {
-                  const dur = parseFloat(newDuration);
-                  const work = parseFloat(prev.workTime || 0);
-                  const adjustedWorkTime = work > dur ? "" : prev.workTime;
-                  return {
-                    ...prev,
-                    duration: newDuration,
-                    workTime: adjustedWorkTime,
-                  };
-                });
-              }}
-            >
-              <option value="" disabled hidden>
-                Insert estimated duration of to-do
-              </option>
-              {generateOptions(10).map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-
-            <label>Work Time Duration:</label>
-            <select
-              value={selectedTask.workTime}
-              onChange={(e) =>
-                setSelectedTask({ ...selectedTask, workTime: e.target.value })
-              }
-            >
-              <option value="" disabled hidden>
-                I want to work on this for __ hours at once
-              </option>
-              {generateOptions(
-                selectedTask.duration ? parseFloat(selectedTask.duration) : 10
-              ).map((w) => (
-                <option key={w} value={w}>
-                  {w}
-                </option>
-              ))}
-            </select>
-
-            <label>Due Date:</label>
-            <input
-              type="date"
-              value={selectedTask.dueDate}
-              onChange={(e) =>
-                setSelectedTask({ ...selectedTask, dueDate: e.target.value })
-              }
-            />
-
-            <label>Due Time:</label>
-            <div style={{ width: "100%" }}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <TimePicker
-                  ampm={false}
-                  value={
-                    selectedTask.dueTime
-                      ? dayjs(`2025-01-01T${selectedTask.dueTime}`)
-                      : null
-                  }
-                  onChange={(value) =>
-                    setSelectedTask({
-                      ...selectedTask,
-                      dueTime: value ? value.format("HH:mm") : "",
-                    })
-                  }
-                  slotProps={{
-                    textField: {
-                      variant: "standard",
-                      InputProps: {
-                        style: {
-                          backgroundColor: "white",
-                          borderRadius: "4px",
-                          fontSize: "1rem",
-                          border: "1px solid #ccc",
-                          height: "36px",
-                          padding: "0 12px",
-                          boxSizing: "border-box",
-                        },
-                      },
-                      fullWidth: true,
-                    },
+              <div className="modal-buttons">
+                <button
+                  className="modal-button close-btn"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowModal(false);
                   }}
-                  sx={{ marginTop: "4px" }}
-                />
-              </LocalizationProvider>
-            </div>
-
-            <div className="modal-buttons">
-              <button
-                className="modal-button close-btn"
-                onClick={() => {
-                  setIsEditing(false);
-                  setShowModal(false);
-                }}
-              >
-                Close
-              </button>{" "}
-              <button
-                className="modal-button delete-btn"
-                onClick={() => {
-                  setTasks(tasks.filter((t) => t.id !== selectedTask.id));
-                  setIsEditing(false);
-                  setShowModal(false);
-                }}
-              >
-                Delete
-              </button>
-              <button
-                className="modal-button submit-btn"
-                onClick={() => {
-                  const exists = tasks.some((t) => t.id === selectedTask.id);
-                  if (exists) {
-                    setTasks((prev) =>
-                      prev.map((t) =>
-                        t.id === selectedTask.id ? selectedTask : t
-                      )
-                    );
-                  } else {
-                    setTasks((prev) => [...prev, selectedTask]);
-                  }
-                  setIsEditing(false);
-                  setShowModal(false);
-                }}
-              >
-                Submit
-              </button>
+                >
+                  Close
+                </button>{" "}
+                <button className="edit-btn" onClick={() => setIsEditing(true)}>
+                  Edit
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {isEditing && selectedTask && (
+          <div className="task-modal">
+            <div className="task-modal-content">
+              <h3>Edit To-Do</h3>
+              <label>Name:</label>
+              <input
+                value={selectedTask.name}
+                onChange={(e) =>
+                  setSelectedTask({ ...selectedTask, name: e.target.value })
+                }
+                placeholder="Insert To-Do name here..."
+              />
+
+              <label>Duration:</label>
+              <select
+                value={selectedTask.duration}
+                onChange={(e) => {
+                  const newDuration = e.target.value;
+                  setSelectedTask((prev) => {
+                    const dur = parseFloat(newDuration);
+                    const work = parseFloat(prev.workTime || 0);
+                    const adjustedWorkTime = work > dur ? "" : prev.workTime;
+                    return {
+                      ...prev,
+                      duration: newDuration,
+                      workTime: adjustedWorkTime,
+                    };
+                  });
+                }}
+              >
+                <option value="" disabled hidden>
+                  Insert estimated duration of to-do
+                </option>
+                {generateOptions(10).map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+
+              <label>Work Time Duration:</label>
+              <select
+                value={selectedTask.workTime}
+                onChange={(e) =>
+                  setSelectedTask({ ...selectedTask, workTime: e.target.value })
+                }
+              >
+                <option value="" disabled hidden>
+                  I want to work on this for __ hours at once
+                </option>
+                {generateOptions(
+                  selectedTask.duration ? parseFloat(selectedTask.duration) : 10
+                ).map((w) => (
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
+                ))}
+              </select>
+
+              <label>Due Date:</label>
+              <input
+                type="date"
+                value={selectedTask.dueDate}
+                onChange={(e) =>
+                  setSelectedTask({ ...selectedTask, dueDate: e.target.value })
+                }
+              />
+
+              <label>Due Time:</label>
+              <div style={{ width: "100%" }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <TimePicker
+                    ampm={false}
+                    value={
+                      selectedTask.dueTime
+                        ? dayjs(`2025-01-01T${selectedTask.dueTime}`)
+                        : null
+                    }
+                    onChange={(value) =>
+                      setSelectedTask({
+                        ...selectedTask,
+                        dueTime: value ? value.format("HH:mm") : "",
+                      })
+                    }
+                    slotProps={{
+                      textField: {
+                        variant: "standard",
+                        InputProps: {
+                          style: {
+                            backgroundColor: "white",
+                            borderRadius: "4px",
+                            fontSize: "1rem",
+                            border: "1px solid #ccc",
+                            height: "36px",
+                            padding: "0 12px",
+                            boxSizing: "border-box",
+                          },
+                        },
+                        fullWidth: true,
+                      },
+                    }}
+                    sx={{ marginTop: "4px" }}
+                  />
+                </LocalizationProvider>
+              </div>
+
+              <div className="modal-buttons">
+                <button
+                  className="modal-button close-btn"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowModal(false);
+                  }}
+                >
+                  Close
+                </button>{" "}
+                <button
+                  className="modal-button delete-btn"
+                  onClick={() => {
+                    setTasks(tasks.filter((t) => t.id !== selectedTask.id));
+                    setIsEditing(false);
+                    setShowModal(false);
+                  }}
+                >
+                  Delete
+                </button>
+                <button
+                  className="modal-button submit-btn"
+                  onClick={() => {
+                    const exists = tasks.some((t) => t.id === selectedTask.id);
+                    if (exists) {
+                      setTasks((prev) =>
+                        prev.map((t) =>
+                          t.id === selectedTask.id ? selectedTask : t
+                        )
+                      );
+                    } else {
+                      setTasks((prev) => [...prev, selectedTask]);
+                    }
+                    setIsEditing(false);
+                    setShowModal(false);
+                  }}
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

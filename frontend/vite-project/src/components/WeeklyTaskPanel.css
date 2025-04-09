@@ -32,7 +32,8 @@
   border: 2px solid blue;
   border-radius: 8px;
   width: 320px;
-  margin-top: 70px;
+  flex-grow: 1;
+  margin-top: 75px;
 }
 
 .task-panel-header {

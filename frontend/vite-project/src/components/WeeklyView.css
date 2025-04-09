@@ -1,5 +1,5 @@
 .weekly-container {
-  padding: 20px;
+  padding: 5px;
   font-family: Arial, sans-serif;
   background-color: white;
 }
@@ -47,13 +47,14 @@
 .day-cell {
   position: relative;
   height: 28px;
+  font-weight: bold;
   border-bottom: 1px solid #eee;
   border-right: 1px solid #eee;
   padding: 0;
 }
 
 .day-column {
-  width: 100px;
+  width: 140px;
 }
 
 .day-header {

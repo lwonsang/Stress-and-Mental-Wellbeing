@@ -6,31 +6,40 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { useEffect } from "react";
 
 const WeeklyPage = () => {
-  const [tasks, setTasks] = useState([
-    {
-      id: "t1",
-      name: "Team Meeting",
-      duration: "1h",
-      workTime: "3h",
-      dueDate: "2025-03-31",
-      dueTime: "10:00",
-      date: "2025-04-07",
-      time: "10:00",
-    },
-    {
-      id: "t2",
-      name: "Workout",
-      duration: "1h",
-      workTime: "1h",
-      dueDate: "2025-04-02",
-      dueTime: "18:00",
-      date: "2025-04-09",
-      time: "18:00",
-    },
-  ]);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem("tasks");
+    return saved ? JSON.parse(saved) : [
+      {
+        id: "t1",
+        name: "Team Meeting",
+        duration: "1h",
+        workTime: "3h",
+        dueDate: "2025-03-31",
+        dueTime: "10:00",
+        date: "2025-04-07",
+        time: "10:00",
+      },
+      {
+        id: "t2",
+        name: "Workout",
+        duration: "1h",
+        workTime: "1h",
+        dueDate: "2025-04-02",
+        dueTime: "18:00",
+        date: "2025-04-09",
+        time: "18:00",
+      },
+    ];
+  });
 
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  
   const generateOptions = (max) => {
     const options = [];
     for (let i = 0.5; i <= max; i += 0.5) {

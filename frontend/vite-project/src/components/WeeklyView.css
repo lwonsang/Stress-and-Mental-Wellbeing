@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .nav-btn {
@@ -117,7 +117,7 @@
 }
 
 .task-modal-content {
-  background-color: #f0f0f0;
+  background-color: #9fa9c5;
   padding: 20px 30px;
   border-radius: 10px;
   min-width: 300px;
@@ -129,7 +129,6 @@
   text-align: center;
   margin-bottom: 16px;
 }
-
 
 .modal-buttons {
   display: flex;
@@ -156,4 +155,61 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.weekly-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 24px;
+}
+
+.task-modal-content input {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.modal-button {
+  flex: 1;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.delete-btn {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.submit-btn {
+  background-color: #34c759;
+  color: white;
+}
+
+.task-modal-content select {
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 14px;
 }

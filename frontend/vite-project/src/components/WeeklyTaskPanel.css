@@ -1,0 +1,79 @@
+.task-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  margin: 5px 0;
+  border-radius: 6px;
+  background-color: #e6e6ff;
+  transition: background-color 0.2s;
+  cursor: grab;
+}
+
+.task-row.drag-over {
+  background-color: #ccccff;
+  border: 2px dashed #3333cc;
+}
+
+.task-row.placeholder {
+  justify-content: center;
+  background-color: #d0e0ff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.todo-placeholder {
+  font-size: 16px;
+  color: #0047ab;
+}
+
+.task-panel {
+  background-color: #a5bfff;
+  padding: 10px;
+  border: 2px solid blue;
+  border-radius: 8px;
+  width: 320px;
+  margin-top: 70px;
+}
+
+.task-panel-header {
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.task-index {
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.task-icon {
+  margin-right: 8px;
+  cursor: move;
+}
+
+.task-name {
+  flex-grow: 1;
+}
+
+.task-edit {
+  margin-right: 8px;
+  color: #3333cc;
+  cursor: pointer;
+}
+
+.task-check {
+  margin-left: auto;
+}
+
+.generate-btn {
+  margin-top: 10px;
+  width: 100%;
+  background-color: #32cd32;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

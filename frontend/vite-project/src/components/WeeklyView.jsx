@@ -85,8 +85,10 @@ const WeeklyPage = ({ goHome }) => {
       })
     );
 
+    const insufficientTasks = [];
+
     const newTasks = tasks.map((task) => {
-      if (task.slots && task.slots.length > 0) return task;
+      if (Array.isArray(task.slots) && task.slots.length > 0) return task;
 
       const total = parseFloat(task.duration);
       const unit = parseFloat(task.workTime);
@@ -127,10 +129,23 @@ const WeeklyPage = ({ goHome }) => {
         offset++;
       }
 
+      if (filled < needed) {
+        insufficientTasks.push(task.name || "Unnamed Task");
+        return { ...task, slots: undefined };
+      }
+
       return { ...task, slots: newSlots };
     });
 
     setTasks(newTasks);
+
+    if (insufficientTasks.length > 0) {
+      alert(
+        `Some tasks couldn't be fully scheduled before their due time:\n\n${insufficientTasks.join(
+          "\n"
+        )}\n\nPlease adjust the due date, time, or duration and try again.`
+      );
+    }
   };
 
   const [selectedTask, setSelectedTask] = useState(null);
@@ -349,13 +364,20 @@ const WeeklyPage = ({ goHome }) => {
                             original.duration !== selectedTask.duration;
                           const workTimeChanged =
                             original.workTime !== selectedTask.workTime;
+                          const dueDateChanged =
+                            original.dueDate !== selectedTask.dueDate;
+                          const dueTimeChanged =
+                            original.dueTime !== selectedTask.dueTime;
+
+                          const shouldClearSlots =
+                            durationChanged ||
+                            workTimeChanged ||
+                            dueDateChanged ||
+                            dueTimeChanged;
 
                           return {
                             ...selectedTask,
-                            slots:
-                              durationChanged || workTimeChanged
-                                ? []
-                                : original.slots || [],
+                            slots: shouldClearSlots ? [] : original.slots || [],
                           };
                         })
                       );

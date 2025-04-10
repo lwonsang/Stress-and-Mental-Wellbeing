@@ -8,8 +8,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import Header from "./Header";
+import EventBox from "./EventBox";
 
 const WeeklyPage = ({ goHome }) => {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showEventModal, setShowEventModal] = useState(false);
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
     return saved
@@ -43,6 +46,121 @@ const WeeklyPage = ({ goHome }) => {
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
+  const [events, setEvents] = useState(() => {
+    const saved = localStorage.getItem("events");
+    return saved
+      ? JSON.parse(saved)
+      : [
+          {
+            id: "e1",
+            name: "Daily Meeting", 
+            startTime: "10:00",
+            startDate: "2025-04-07",
+            endTime: "11:30",
+            endDate: "2025-04-11",
+            repeat: "daily",
+          },
+          {
+            id: "e2",
+            name: "Doctor Appointment",
+            startTime: "15:00",
+            startDate: "2025-04-08",
+            endTime: "16:00",
+            endDate: "2025-04-08",
+            repeat: "never",
+          },
+          {
+            id: "e3",
+            name: "Team Sync",
+            startTime: "09:00",
+            startDate: "2025-04-09",
+            endTime: "09:30",
+            endDate: "2025-04-30",
+            repeat: "weekly",
+          },
+        ];
+  });
+  useEffect(() => {
+    const eventSlots = expandEventSlots(events);
+    const cleanedTasks = removeTaskConflicts(tasks, eventSlots);
+    setTasks(cleanedTasks);
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem("events", JSON.stringify(events));
+  }, [events]);
+
+  const expandEventSlots = (events) => {
+    const eventSlots = [];
+
+    events.forEach((event) => {
+      const { id, name, startTime, startDate, endTime, endDate, repeat } =
+        event;
+
+      const start = new Date(`${startDate}T${startTime}`);
+      const end = new Date(`${endDate}T${endTime}`);
+      let current = new Date(start);
+
+      while (current <= end) {
+        const dateStr = current.toISOString().split("T")[0];
+
+        const [startHour, startMin] = startTime.split(":").map(Number);
+        const [endHour, endMin] = endTime.split(":").map(Number);
+        let durationHours =
+          (endHour * 60 + endMin - (startHour * 60 + startMin)) / 60;
+        durationHours = Math.max(1, durationHours);
+        eventSlots.push({
+          id,
+          name,
+          date: dateStr,
+          time: startTime,
+          duration: durationHours,
+          endTime,
+          repeat,
+          startDate,
+          endDate,
+        });
+
+        if (repeat === "never") break;
+        if (repeat === "daily") current.setDate(current.getDate() + 1);
+        else if (repeat === "weekly") current.setDate(current.getDate() + 7);
+        else if (repeat === "monthly") current.setMonth(current.getMonth() + 1);
+      }
+    });
+
+    return eventSlots;
+  };
+
+  const removeTaskConflicts = (taskList, eventSlots) => {
+    const blockedKeys = new Set(
+      eventSlots.flatMap((e) => {
+        const [sh, sm] = e.time.split(":").map(Number);
+        const blocks = [];
+        for (let i = 0; i < Math.ceil(e.duration * 2); i++) {
+          const totalMin = sh * 60 + sm + i * 30;
+          const h = Math.floor(totalMin / 60);
+          const m = totalMin % 60;
+          blocks.push(
+            `${e.date}-${h.toString().padStart(2, "0")}:${m
+              .toString()
+              .padStart(2, "0")}`
+          );
+        }
+        return blocks;
+      })
+    );
+
+    return taskList.map((task) => {
+      const hasConflict = (task.slots || []).some((slot) =>
+        blockedKeys.has(`${slot.date}-${slot.time}`)
+      );
+
+      return {
+        ...task,
+        slots: hasConflict ? [] : task.slots,
+      };
+    });
+  };
 
   const generateOptions = (max) => {
     const options = [];
@@ -84,6 +202,21 @@ const WeeklyPage = ({ goHome }) => {
         used.add(`${s.date}-${(hour + 1).toString().padStart(2, "0")}:00`);
       })
     );
+    const eventSlots = expandEventSlots(events);
+    eventSlots.forEach((e) => {
+      const [startHour, startMin] = e.time.split(":").map(Number);
+      const duration = parseFloat(e.duration || 1);
+      const totalHalfHours = Math.ceil(duration * 2);
+
+      for (let i = 0; i < totalHalfHours; i++) {
+        const hour = startHour + Math.floor((startMin + i * 30) / 60);
+        const minute = (startMin + i * 30) % 60;
+        const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        used.add(`${e.date}-${timeStr}`);
+      }
+    });
 
     const insufficientTasks = [];
 
@@ -158,10 +291,14 @@ const WeeklyPage = ({ goHome }) => {
       <div className="weekly-layout">
         <WeeklyView
           tasks={tasks}
+          events={events}
+          eventSlots={expandEventSlots(events)}
           setTasks={setTasks}
           setSelectedTask={setSelectedTask}
           setShowModal={setShowModal}
           setIsEditing={setIsEditing}
+          setSelectedEvent={setSelectedEvent}
+          setShowEventModal={setShowEventModal}
         />
         <WeeklyTaskPanel
           tasks={tasks}
@@ -170,6 +307,8 @@ const WeeklyPage = ({ goHome }) => {
           setShowModal={setShowModal}
           setIsEditing={setIsEditing}
           generateSchedule={generateSchedule}
+          setSelectedEvent={setSelectedEvent} 
+          setShowEventModal={setShowEventModal}
         />
 
         {showModal && selectedTask && (
@@ -205,6 +344,37 @@ const WeeklyPage = ({ goHome }) => {
                 >
                   Close
                 </button>{" "}
+              </div>
+            </div>
+          </div>
+        )}
+        {showEventModal && selectedEvent && (
+          <div className="task-modal">
+            <div className="task-modal-content">
+              <h3>{selectedEvent.name}</h3>
+              <p>
+                <strong>Date:</strong> {selectedEvent.date}
+              </p>
+              <p>
+                <strong>Time:</strong> {selectedEvent.time} ~{" "}
+                {selectedEvent.endTime}
+              </p>
+              <p>
+                <strong>Repeat:</strong> {selectedEvent.repeat}
+              </p>
+              <p>
+                <strong>Start Date:</strong> {selectedEvent.startDate}
+              </p>
+              <p>
+                <strong>End Date:</strong> {selectedEvent.endDate}
+              </p>
+              <div className="modal-buttons">
+                <button
+                  className="modal-button close-btn"
+                  onClick={() => setShowEventModal(false)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
@@ -416,10 +586,14 @@ const hours = Array.from(
 
 const WeeklyView = ({
   tasks,
+  events,
+  eventSlots,
   setTasks,
   setSelectedTask,
   setShowModal,
   setIsEditing,
+  setSelectedEvent,
+  setShowEventModal,
 }) => {
   const getStartOfWeek = (date) => {
     const d = new Date(date);
@@ -515,39 +689,50 @@ const WeeklyView = ({
           const dateStr = date.toISOString().split("T")[0];
 
           return (
-            <div key={i} className="day-column">
+            <div
+              key={i}
+              className="day-column"
+              style={{ position: "relative" }}
+            >
               <div className="day-header">
                 {formatDate(date)}
                 <br />
                 {dayName}
               </div>
-              {hours.map((hour, j) => {
-                const tasksInSlot = tasks.filter((t) =>
-                  t.slots?.some((s) => s.date === dateStr && s.time === hour)
-                );
 
-                return (
-                  <div
-                    key={j}
-                    className="day-cell"
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => handleDrop(e, dateStr, hour)}
-                  >
-                    {tasks.flatMap((task) =>
-                      task.slots
-                        ?.filter((s) => s.date === dateStr && s.time === hour)
-                        .map((slot, idx) => (
-                          <TaskBox
-                            key={`${task.id}-${slot.date}-${slot.time}-${idx}`}
-                            task={task}
-                            slot={slot}
-                            onClick={onClickTask}
-                          />
-                        ))
-                    )}
-                  </div>
-                );
-              })}
+              {hours.map((hour, j) => (
+                <div
+                  key={j}
+                  className="day-cell"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => handleDrop(e, dateStr, hour)}
+                >
+                  {eventSlots
+                    .filter((e) => e.date === dateStr && e.time === hour)
+                    .map((event, idx) => (
+                      <EventBox
+                        key={`event-${event.id}-${idx}`}
+                        event={event}
+                        onClick={() => {
+                          setSelectedEvent(event);
+                          setShowEventModal(true);
+                        }}
+                      />
+                    ))}
+                  {tasks.flatMap((task) =>
+                    task.slots
+                      ?.filter((s) => s.date === dateStr && s.time === hour)
+                      .map((slot, idx) => (
+                        <TaskBox
+                          key={`${task.id}-${slot.date}-${slot.time}-${idx}`}
+                          task={task}
+                          slot={slot}
+                          onClick={onClickTask}
+                        />
+                      ))
+                  )}
+                </div>
+              ))}
             </div>
           );
         })}

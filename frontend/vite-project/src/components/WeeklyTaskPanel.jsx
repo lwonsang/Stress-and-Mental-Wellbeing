@@ -10,8 +10,9 @@ const WeeklyTaskPanel = ({
   generateSchedule,
 }) => {
   const draggingItemIndex = useRef(null);
+  const originalOrderRef = useRef([]);
+
   const [dragOverIndex, setDragOverIndex] = useState(null);
-  const [draggingTaskId, setDraggingTaskId] = useState(null);
 
   const handleEdit = (task) => {
     setSelectedTask(task);
@@ -37,22 +38,37 @@ const WeeklyTaskPanel = ({
 
   const handleDragStart = (index) => {
     draggingItemIndex.current = index;
-    setDraggingTaskId(tasks[index].id);
+    originalOrderRef.current = tasks.map((t) => t.id);
   };
 
   const handleDragEnter = (index) => {
     if (index === draggingItemIndex.current) return;
+
     const updatedTasks = [...tasks];
     const draggedItem = updatedTasks.splice(draggingItemIndex.current, 1)[0];
     updatedTasks.splice(index, 0, draggedItem);
     draggingItemIndex.current = index;
+
     setTasks(updatedTasks);
     setDragOverIndex(index);
   };
 
   const handleDragEnd = () => {
     setDragOverIndex(null);
-    setDraggingTaskId(null);
+    draggingItemIndex.current = null;
+
+    const oldOrder = originalOrderRef.current;
+    const newTasks = [...tasks];
+
+    newTasks.forEach((task, newIndex) => {
+      const oldIndex = oldOrder.indexOf(task.id);
+      if (oldIndex !== newIndex) {
+        task.slots = [];
+      }
+    });
+
+    setTasks(newTasks);
+    originalOrderRef.current = [];
   };
 
   return (

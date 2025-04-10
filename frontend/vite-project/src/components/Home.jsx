@@ -44,7 +44,9 @@ const Home = ({ goToWeekly }) => {
     <div className="home-page">
       <Header
         title="Project Name?"
+        monthButtonText="View Monthly"
         rightButtonText="Edit Schedule"
+        onMonthButtonClick={goToMonthly}
         onRightButtonClick={goToWeekly}
       />
 

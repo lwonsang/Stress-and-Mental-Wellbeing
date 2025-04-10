@@ -5,7 +5,9 @@ const Header = ({
   title,
   showHome,
   onHomeClick,
+  monthButtonText,
   rightButtonText,
+  onMonthButtonClick,
   onRightButtonClick,
 }) => {
   return (
@@ -25,8 +27,13 @@ const Header = ({
         )}
         <div className="header-title">{title}</div>
       </div>
-      {rightButtonText && (
+      {monthButtonText && (
         <button className="header-button" onClick={onRightButtonClick}>
+          {monthButtonText}
+        </button>
+      )}
+      {rightButtonText && (
+        <button className="header-button" onClick={onMonthButtonClick}>
           {rightButtonText}
         </button>
       )}

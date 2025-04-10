@@ -12,8 +12,18 @@ function App() {
 
   return (
     <div>
-      {page === "home" && <Home goToWeekly={() => setPage("weekly")} />}
-      {page === "weekly" && <WeeklyPage goHome={() => setPage("home")} />}
+      {page === "home" && (
+        <Home
+          goToWeekly={() => setPage("weekly")}
+          goToMonthly={() => setPage("monthly")}
+        />
+      )}
+      {page === "weekly" && (
+        <WeeklyPage goHome={() => setPage("home")} />
+      )}
+      {page === "monthly" && (
+        <Calendar goHome={() => setPage("home")} />
+      )}
     </div>
   );
 }

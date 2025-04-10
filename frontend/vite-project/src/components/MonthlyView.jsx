@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Box, Grid, Text } from '@mantine/core';
+import { Box, Grid, Text, Modal, TextInput, Select, Button } from '@mantine/core';
 import { DayCell } from './DayCell';
 import { MonthSwitcher } from './Monthswitch';
+import Header from './Header'
+import AddEventModal from './AddEventModal';
 
 const months = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -11,7 +13,7 @@ const months = [
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const getCalendarCells = (startDayIndex = 2, totalDays = 30) => {
+const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick) => {
   const cells = [];
 
   for (let i = 0; i < startDayIndex; i++) {
@@ -21,7 +23,7 @@ const getCalendarCells = (startDayIndex = 2, totalDays = 30) => {
   for (let day = 1; day <= totalDays; day++) {
     cells.push(
       <Grid.Col span={1} key={day}>
-        <DayCell dayNumber={day} events={[{ text: 'X Event', highlight: true }, { text: 'xxx' }]} />
+        <DayCell dayNumber={day} events={[{ text: 'X Event', highlight: true }, { text: 'xxx' }]} onAddClick={onAddClick} />
       </Grid.Col>
     );
   }
@@ -29,9 +31,12 @@ const getCalendarCells = (startDayIndex = 2, totalDays = 30) => {
   return cells;
 };
 
-export default function Calendar() {
+const Calendar = ({ goHome }) => {
 
   const [date, setDate] = useState(new Date());
+  const [modalOpened, setModalOpened] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+
 
   const handlePrev = () => {
     setDate((prev) => {
@@ -49,8 +54,16 @@ export default function Calendar() {
     });
   };
 
+  const openModalForDay = (day) => {
+    console.log('Opening modal for day', day);
+    setSelectedDay(day);
+    setModalOpened(true);
+  };
+  
+
   return (
     <>
+      <Header title="Project Name?" showHome={true} onHomeClick={goHome} />
       <MonthSwitcher 
         month={months[date.getMonth()]}
         year={date.getFullYear()}
@@ -70,10 +83,17 @@ export default function Calendar() {
           </Grid>
           
           <Grid columns={7} gutter="xs">
-            {getCalendarCells()}
+            {getCalendarCells(2, 30, openModalForDay)}
           </Grid>
         </div>
       </Box>
+      <AddEventModal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        selectedDay={selectedDay}
+      />
     </>
   );
 }
+
+export default Calendar;

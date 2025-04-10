@@ -1,10 +1,9 @@
-import { Paper, Text, Button } from '@mantine/core';
+import { Paper, Text, Button} from '@mantine/core';
 import { useState } from 'react';
-import TaskBox from "./TaskBox";
 
-export function DayCell({ dayNumber, events = [] }) {
+export function DayCell({ dayNumber, events = [], onAddClick}) {
   const [hovered, setHovered] = useState(false);
-  const [showTaskBox, setShowTaskBox] = useState(false);
+  const [modalOpened, setModalOpened] = useState(false);
 
   return (
     <Paper
@@ -66,15 +65,7 @@ export function DayCell({ dayNumber, events = [] }) {
             transform: 'translateX(-50%)',
           }}
         >
-          <Button size="xs" variant="white" onClick={() => setShowTaskBox(true)}>
-            Add
-          </Button>
-        </div>
-      )}
-
-      {showTaskBox && (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-          <TaskBox onClose={() => setShowTaskBox(false)} />
+          <Button size="xs" onClick={() => onAddClick(dayNumber)}>Add</Button>
         </div>
       )}
     </Paper>

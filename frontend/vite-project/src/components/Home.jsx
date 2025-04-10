@@ -16,7 +16,7 @@ const getStartOfWeek = () => {
   return now;
 };
 
-const Home = ({ goToWeekly }) => {
+const Home = ({ goToWeekly, goToMonthly}) => {
   const [tasks, setTasks] = useState([]);
   const [weekStart] = useState(getStartOfWeek());
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -105,7 +105,7 @@ const Home = ({ goToWeekly }) => {
             <div className="readonly-row">
               <div className="readonly-cell empty-cell" />
               {dateList.map((_, i) => (
-                <div key={i} className="readonly-cell day-label">
+                <div key={i} className="readonly-cell day-label">m 
                   {days[i]}
                 </div>
               ))}

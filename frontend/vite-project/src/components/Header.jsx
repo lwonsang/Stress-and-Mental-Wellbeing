@@ -27,13 +27,13 @@ const Header = ({
         )}
         <div className="header-title">{title}</div>
       </div>
-      {monthButtonText && (
-        <button className="header-button" onClick={onRightButtonClick}>
+      {rightButtonText && (
+        <button className="header-button" onClick={onMonthButtonClick}>
           {monthButtonText}
         </button>
       )}
-      {rightButtonText && (
-        <button className="header-button" onClick={onMonthButtonClick}>
+      {monthButtonText && (
+        <button className="header-button" onClick={onRightButtonClick}>
           {rightButtonText}
         </button>
       )}

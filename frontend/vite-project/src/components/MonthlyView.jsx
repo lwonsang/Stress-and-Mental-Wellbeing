@@ -36,6 +36,8 @@ const Calendar = ({ goHome }) => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+
 
 
   const handlePrev = () => {
@@ -83,7 +85,9 @@ const Calendar = ({ goHome }) => {
           </Grid>
           
           <Grid columns={7} gutter="xs">
-            {getCalendarCells(2, 30, openModalForDay)}
+            {getCalendarCells(firstDayOfMonth.getDay(),
+            new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(),
+            openModalForDay)}
           </Grid>
         </div>
       </Box>

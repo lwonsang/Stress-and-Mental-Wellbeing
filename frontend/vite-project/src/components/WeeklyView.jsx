@@ -53,7 +53,7 @@ const WeeklyPage = ({ goHome }) => {
       : [
           {
             id: "e1",
-            name: "Daily Meeting", 
+            name: "Daily Meeting",
             startTime: "10:00",
             startDate: "2025-04-07",
             endTime: "11:30",
@@ -307,7 +307,7 @@ const WeeklyPage = ({ goHome }) => {
           setShowModal={setShowModal}
           setIsEditing={setIsEditing}
           generateSchedule={generateSchedule}
-          setSelectedEvent={setSelectedEvent} 
+          setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
         />
 
@@ -637,29 +637,29 @@ const WeeklyView = ({
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
     const { taskId, slot: oldSlot } = data;
-  
+
     const now = new Date();
     const dropTime = new Date(`${targetDateStr}T${targetTime}`);
     if (dropTime < now) {
       alert("You can't move a task to the past.");
       return;
     }
-  
+
     const newSlot = { date: targetDateStr, time: targetTime };
-  
+
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id !== taskId) return t;
-  
+
         const updatedSlots = t.slots
           .filter((s) => !(s.date === oldSlot.date && s.time === oldSlot.time))
           .concat([newSlot]);
-  
+
         return { ...t, slots: updatedSlots };
       })
     );
   };
-  
+
   const onClickTask = (task, slot) => {
     setSelectedTask({
       ...task,

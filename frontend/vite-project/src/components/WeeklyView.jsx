@@ -637,22 +637,29 @@ const WeeklyView = ({
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("application/json"));
     const { taskId, slot: oldSlot } = data;
-
+  
+    const now = new Date();
+    const dropTime = new Date(`${targetDateStr}T${targetTime}`);
+    if (dropTime < now) {
+      alert("You can't move a task to the past.");
+      return;
+    }
+  
     const newSlot = { date: targetDateStr, time: targetTime };
-
+  
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id !== taskId) return t;
-
+  
         const updatedSlots = t.slots
-          .filter((s) => !(s.date === oldSlot.date && s.time === oldSlot.time)) // 删除旧的
+          .filter((s) => !(s.date === oldSlot.date && s.time === oldSlot.time))
           .concat([newSlot]);
-
+  
         return { ...t, slots: updatedSlots };
       })
     );
   };
-
+  
   const onClickTask = (task, slot) => {
     setSelectedTask({
       ...task,

@@ -1,6 +1,9 @@
 .readonly-grid {
   padding: 20px;
   overflow-x: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 .readonly-row {
@@ -8,46 +11,53 @@
 }
 
 .readonly-cell {
-  border: 1px solid #ccc;
-  width: 100px;
+  border: 1px solid #eee;
+  width: 80px;
   height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 13px;
+  position: relative;
 }
 
 .time-label {
   background-color: #f0f0ff;
   font-weight: bold;
+  color: #333;
 }
 
 .day-label {
-  background-color: #dbe0ff;
+  background-color: #e6edff;
   font-weight: bold;
   color: #1a00ff;
+  border-bottom: 1px solid #ccc;
 }
 
 .task-slot {
-  background-color: #f5f5ff;
+  position: relative;
+  padding: 0;
+  margin: 0;
 }
 
 .readonly-task {
-  background-color: #3300cc;
+  background-color: #3f51b5;
   color: white;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
   text-align: center;
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 6px;
   box-sizing: border-box;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
 .home-main {
@@ -69,7 +79,7 @@
 .task-list-panel {
   flex: 1;
   margin-top: 50px;
-  background-color: #f0f4ff;
+  background-color: #a5bfff;
   border: 1px solid #ccc;
   padding: 16px;
   border-radius: 10px;

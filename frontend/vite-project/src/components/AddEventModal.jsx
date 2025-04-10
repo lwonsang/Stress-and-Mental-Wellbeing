@@ -1,7 +1,17 @@
+import { useState } from 'react';
 import { Modal, Select, TextInput, Button, Box, Title, Group} from '@mantine/core';
 import { TimeInput } from '@mantine/dates'
+import { DateInput } from '@mantine/dates';
 
-export default function AddEventModal({ opened, onClose, selectedDay}) {
+export default function AddEventModal({ opened, onClose, selectedDay, onCreate }) {
+  const [eventType, setEventType] = useState('');
+  const [eventName, setEventName] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [repeat, setRepeat] = useState('');
+
   return (
     <Modal
       opened={opened}
@@ -20,33 +30,53 @@ export default function AddEventModal({ opened, onClose, selectedDay}) {
 
       <Box>
         <Select
-          label="Task Type:"
+          label="Event Type:"
           placeholder="Open dropdown menu..."
           data={['Classes', 'Club activities', 'Extracurriculars', 'Other']}
+          value={eventType}
+          onChange={setEventType}
           mt="xs"
         />
         <TextInput
-          label="Task Name:"
-          placeholder="Insert task name here..."
+          label="Event Name:"
+          placeholder="Insert Event name here..."
+          mt="sm"
+          value={eventName}
+          onChange={(e) => setEventName(e.currentTarget.value)}
+        />
+        <DateInput
+          label="Start Date:"
+          value={startDate}
+          onChange={setStartDate}
           mt="sm"
         />
         <TimeInput
           label="Start Time:"
-          placeholder="Select time"
+          value={startTime}
+          onChange={(event) => setStartTime(event.currentTarget.value)}
           mt="sm"
-          format="12"
+          format="24"
         />
 
         <TimeInput
           label="End Time:"
-          placeholder="Select time"
+          value={endTime}
+          onChange={(event) => setEndTime(event.currentTarget.value)}
           mt="sm"
-          format="12"
+          format="24"
+        />
+        <DateInput
+          label="End Date:"
+          value={endDate}
+          onChange={setEndDate}
+          mt="sm"
         />
         <Select
           label="Repeats:"
           placeholder="Open dropdown menu..."
           data={['Monthly', 'Weekly', 'Daily', 'Never']}
+          value={repeat}
+          onChange={setRepeat}
           mt="sm"
         />
         <Group mt="xl" grow>
@@ -69,7 +99,18 @@ export default function AddEventModal({ opened, onClose, selectedDay}) {
               fontWeight: 'bold',
               fontSize: '1.1rem'
             }}
-          >
+            onClick={() => {
+              onCreate({
+                name: eventName || eventType,
+                startDate,
+                endDate,
+                startTime,
+                endTime,
+                repeat
+              });
+              onClose();
+              console.log("Add event: ", eventName, eventType, startTime, endTime, startDate, endDate, repeat)
+            }} >
             Create
           </Button>
         </Group>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Grid, Text, Modal, TextInput, Select, Button } from '@mantine/core';
+import { Box, Grid, Text } from '@mantine/core';
 import { DayCell } from './DayCell';
 import { MonthSwitcher } from './Monthswitch';
 import Header from './Header'
@@ -13,7 +13,43 @@ const months = [
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick) => {
+function expandEvents(events, currentMonth, currentYear) { 
+  //Ideally (if there is nothing wrong), calling this will generate a list of events containing event name, start&end time
+  const expanded = [];
+
+  for (const event of events) {
+    const { startDate, endDate, startTime, endTime, name, repeat } = event;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const date = new Date(d);
+
+      if (date.getMonth() !== currentMonth || date.getFullYear() !== currentYear) continue;
+
+      const isMatch =
+        repeat === 'Daily' ||
+        (repeat === 'Weekly' && date.getDay() === start.getDay()) ||
+        (repeat === 'Monthly' && date.getDate() === start.getDate()) ||
+        (repeat === 'Never' && date.toDateString() === start.toDateString());
+
+      if (isMatch) {
+        expanded.push({
+          date,           
+          name,
+          startTime,      
+          endTime
+        });
+      }
+    }
+  }
+
+  return expanded;
+}
+
+
+const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick, events = []) => {
   const cells = [];
 
   for (let i = 0; i < startDayIndex; i++) {
@@ -21,9 +57,21 @@ const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick) => {
   }
 
   for (let day = 1; day <= totalDays; day++) {
+    const dayEvents = events.filter(e => e.date.getDate() === day);
+    const eventDisplay = dayEvents.length > 0
+      ? [
+          { text: dayEvents[0].name, highlight: true },
+          { text: `${dayEvents[0].startTime} - ${dayEvents[0].endTime}` }
+        ]
+      : [{ text: 'X Event', highlight: true }, { text: 'xxx' }];
+
     cells.push(
       <Grid.Col span={1} key={day}>
-        <DayCell dayNumber={day} events={[{ text: 'X Event', highlight: true }, { text: 'xxx' }]} onAddClick={onAddClick} />
+        <DayCell
+          dayNumber={day}
+          events={eventDisplay}
+          onAddClick={onAddClick}
+        />
       </Grid.Col>
     );
   }
@@ -36,8 +84,10 @@ const Calendar = ({ goHome }) => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [events, setEvents] = useState([]);
   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-
+  const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const visibleEvents = expandEvents(events, date.getMonth(), date.getFullYear());
 
 
   const handlePrev = () => {
@@ -85,9 +135,7 @@ const Calendar = ({ goHome }) => {
           </Grid>
           
           <Grid columns={7} gutter="xs">
-            {getCalendarCells(firstDayOfMonth.getDay(),
-            new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate(),
-            openModalForDay)}
+          {getCalendarCells(firstDayOfMonth.getDay(), daysInMonth, openModalForDay, visibleEvents)}
           </Grid>
         </div>
       </Box>
@@ -95,6 +143,7 @@ const Calendar = ({ goHome }) => {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         selectedDay={selectedDay}
+        onCreate={(newEvent) => setEvents((prev) => [...prev, newEvent])}
       />
     </>
   );

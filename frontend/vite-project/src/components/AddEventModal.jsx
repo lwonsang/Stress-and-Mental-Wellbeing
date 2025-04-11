@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Modal, Select, TextInput, Button, Box, Title, Group} from '@mantine/core';
 import { TimeInput } from '@mantine/dates'
-import { DateInput } from '@mantine/dates';
 
 export default function AddEventModal({ opened, onClose, selectedDay, onCreate }) {
   const [eventType, setEventType] = useState('');
   const [eventName, setEventName] = useState('');
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [repeat, setRepeat] = useState('');
@@ -44,12 +43,16 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           value={eventName}
           onChange={(e) => setEventName(e.currentTarget.value)}
         />
-        <DateInput
+
+        <TextInput
           label="Start Date:"
+          type="date"
           value={startDate}
-          onChange={setStartDate}
+          onChange={(e) => setStartDate(e.currentTarget.value)}
           mt="sm"
         />
+
+        
         <TimeInput
           label="Start Time:"
           value={startTime}
@@ -65,12 +68,15 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           mt="sm"
           format="24"
         />
-        <DateInput
+        
+        <TextInput
           label="End Date:"
+          type="date"
           value={endDate}
-          onChange={setEndDate}
+          onChange={(e) => setEndDate(e.currentTarget.value)}
           mt="sm"
         />
+        
         <Select
           label="Repeats:"
           placeholder="Open dropdown menu..."
@@ -100,14 +106,15 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
               fontSize: '1.1rem'
             }}
             onClick={() => {
-              onCreate({
+              const eventData = {
                 name: eventName || eventType,
                 startDate,
                 endDate,
                 startTime,
                 endTime,
                 repeat
-              });
+              };
+              onCreate(eventData); 
               onClose();
               console.log("Add event: ", eventName, eventType, startTime, endTime, startDate, endDate, repeat)
             }} >

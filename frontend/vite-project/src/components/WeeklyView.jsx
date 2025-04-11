@@ -9,10 +9,13 @@ import dayjs from "dayjs";
 import { useEffect } from "react";
 import Header from "./Header";
 import EventBox from "./EventBox";
+import { useNavigate } from "react-router-dom";
 
-const WeeklyPage = ({ goHome }) => {
+const WeeklyPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
+  const navigate = useNavigate();
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
     return saved
@@ -195,13 +198,31 @@ const WeeklyPage = ({ goHome }) => {
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const used = new Set();
-    tasks.forEach((t) =>
-      t.slots?.forEach((s) => {
-        const hour = parseInt(s.time.split(":")[0], 10);
-        used.add(`${s.date}-${hour.toString().padStart(2, "0")}:00`);
-        used.add(`${s.date}-${(hour + 1).toString().padStart(2, "0")}:00`);
-      })
-    );
+
+    tasks.forEach((task) => {
+      if (!task.slots || !task.slots.length) return;
+
+      const unitStr = String(task.workTime || "")
+        .replace("h", "")
+        .trim();
+      const unit = parseFloat(unitStr) || 1;
+
+      task.slots.forEach((slot) => {
+        const [startHour, startMin] = slot.time.split(":").map(Number);
+
+        const halfHoursCount = Math.ceil(unit * 2);
+
+        for (let i = 0; i < halfHoursCount; i++) {
+          const hh = startHour + Math.floor((startMin + i * 30) / 60);
+          const mm = (startMin + i * 30) % 60;
+          const timeStr = `${hh.toString().padStart(2, "0")}:${mm
+            .toString()
+            .padStart(2, "0")}`;
+          used.add(`${slot.date}-${timeStr}`);
+        }
+      });
+    });
+
     const eventSlots = expandEventSlots(events);
     eventSlots.forEach((e) => {
       const [startHour, startMin] = e.time.split(":").map(Number);
@@ -240,21 +261,48 @@ const WeeklyPage = ({ goHome }) => {
             const day = new Date(startDate);
             day.setDate(startDate.getDate() + ((d + offset) % 7));
             const dateStr = day.toISOString().split("T")[0];
-            const slotDateTime = new Date(`${dateStr}T${time}`);
+            const slotStart = new Date(`${dateStr}T${time}`);
 
-            const hour = parseInt(time.split(":")[0], 10);
-            const hourBlock = [
-              `${hour.toString().padStart(2, "0")}:00`,
-              `${(hour + 1).toString().padStart(2, "0")}:00`,
-            ];
-            const blockKeys = hourBlock.map((t) => `${dateStr}-${t}`);
-            const blockUsed = blockKeys.some((k) => used.has(k));
+            if (slotStart > due || slotStart < now) continue;
 
-            if (slotDateTime > due || slotDateTime < now || blockUsed) continue;
+            const unitHalfHours = Math.ceil(unit * 2);
 
-            blockKeys.forEach((k) => used.add(k));
+            const [startHour, startMin] = time.split(":").map(Number);
+            let canUse = true;
+            for (let i = 0; i < unitHalfHours; i++) {
+              const checkHour =
+                startHour + Math.floor((startMin + i * 30) / 60);
+              const checkMin = (startMin + i * 30) % 60;
+              const checkTimeStr = `${checkHour
+                .toString()
+                .padStart(2, "0")}:${checkMin.toString().padStart(2, "0")}`;
+              if (used.has(`${dateStr}-${checkTimeStr}`)) {
+                canUse = false;
+                break;
+              }
+            }
+
+            const slotEnd = new Date(slotStart);
+            slotEnd.setMinutes(slotEnd.getMinutes() + unit * 60);
+            if (slotStart.toDateString() !== slotEnd.toDateString()) {
+              canUse = false;
+            }
+
+            if (!canUse) continue;
+
+            for (let i = 0; i < unitHalfHours; i++) {
+              const checkHour =
+                startHour + Math.floor((startMin + i * 30) / 60);
+              const checkMin = (startMin + i * 30) % 60;
+              const checkTimeStr = `${checkHour
+                .toString()
+                .padStart(2, "0")}:${checkMin.toString().padStart(2, "0")}`;
+              used.add(`${dateStr}-${checkTimeStr}`);
+            }
+
             newSlots.push({ date: dateStr, time });
             filled++;
+
             if (filled >= needed) break;
           }
           if (filled >= needed) break;
@@ -287,7 +335,13 @@ const WeeklyPage = ({ goHome }) => {
 
   return (
     <>
-      <Header title="Project Name?" showHome={true} onHomeClick={goHome} />
+      <Header
+        title="Project Name?"
+        showHome={true}
+        rightButtonText="Edit Events"
+        onRightButtonClick={() => navigate("/monthly")}
+        onHomeClick={() => navigate("/")}
+      />
       <div className="weekly-layout">
         <WeeklyView
           tasks={tasks}
@@ -642,6 +696,62 @@ const WeeklyView = ({
     const dropTime = new Date(`${targetDateStr}T${targetTime}`);
     if (dropTime < now) {
       alert("You can't move a task to the past.");
+      return;
+    }
+
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    const getOccupiedKeys = (dateStr, startTime, durationHours) => {
+      const result = [];
+      const [sh, sm] = startTime.split(":").map(Number);
+      const totalHalfHours = Math.ceil(durationHours * 2);
+
+      for (let i = 0; i < totalHalfHours; i++) {
+        const totalMinutes = sh * 60 + sm + i * 30;
+        const offsetDays = Math.floor(totalMinutes / (24 * 60));
+        const minsInDay = totalMinutes % (24 * 60);
+        const h = Math.floor(minsInDay / 60);
+        const m = minsInDay % 60;
+        const d = new Date(dateStr);
+        d.setDate(d.getDate() + offsetDays);
+        const newDate = d.toISOString().split("T")[0];
+        result.push(
+          `${newDate}-${String(h).padStart(2, "0")}:${String(m).padStart(
+            2,
+            "0"
+          )}`
+        );
+      }
+
+      return result;
+    };
+
+    const used = new Set();
+
+    tasks.forEach((t) => {
+      if (t.id === taskId) return;
+      t.slots?.forEach((s) => {
+        const dur = parseFloat(t.workTime || 1);
+        getOccupiedKeys(s.date, s.time, dur).forEach((k) => used.add(k));
+      });
+    });
+
+    eventSlots.forEach((e) => {
+      getOccupiedKeys(e.date, e.time, parseFloat(e.duration || 1)).forEach(
+        (k) => used.add(k)
+      );
+    });
+
+    const keysToCheck = getOccupiedKeys(
+      targetDateStr,
+      targetTime,
+      parseFloat(task.workTime || 1)
+    );
+    const isOccupied = keysToCheck.some((k) => used.has(k));
+
+    if (isOccupied) {
+      alert("Target time slot is occupied by another task or event.");
       return;
     }
 

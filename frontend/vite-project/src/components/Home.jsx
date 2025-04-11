@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import "./Home.css";
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const hours = Array.from(
@@ -15,12 +16,13 @@ const getStartOfWeek = () => {
   return now;
 };
 
-const Home = ({ goToWeekly, goToMonthly }) => {
+const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [weekStart] = useState(getStartOfWeek());
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [eventSlots, setEventSlots] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
@@ -193,7 +195,7 @@ const Home = ({ goToWeekly, goToMonthly }) => {
           whiteSpace: "normal",
           wordBreak: "break-word",
           maxHeight: "56px",
-          cursor: "pointer", 
+          cursor: "pointer",
         }}
       >
         {event.name}
@@ -237,9 +239,9 @@ const Home = ({ goToWeekly, goToMonthly }) => {
       <Header
         title="Project Name?"
         monthButtonText="Edit Events"
-        rightButtonText="Edit Schedule"
-        onMonthButtonClick={goToMonthly}
-        onRightButtonClick={goToWeekly}
+        rightButtonText="Add Tasks & Edit Schedule"
+        onMonthButtonClick={() => navigate("/monthly")}
+        onRightButtonClick={() => navigate("/weekly")}
       />
 
       <div className="home-main">

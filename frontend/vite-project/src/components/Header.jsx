@@ -27,16 +27,19 @@ const Header = ({
         )}
         <div className="header-title">{title}</div>
       </div>
-      {rightButtonText && monthButtonText && (
-        <div style={{float:'right'}}>
+
+      <div className="header-right">
+        {monthButtonText && (
           <button className="header-button" onClick={onMonthButtonClick}>
             {monthButtonText}
           </button>
+        )}
+        {rightButtonText && (
           <button className="header-button" onClick={onRightButtonClick}>
-            {rightButtonText} 
+            {rightButtonText}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

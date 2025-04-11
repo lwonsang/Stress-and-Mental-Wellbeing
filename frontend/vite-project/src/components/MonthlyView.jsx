@@ -1,17 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Box, Grid, Text } from '@mantine/core';
 import { DayCell } from './DayCell';
-import { MonthSwitcher } from './Monthswitch';
-import Header from './Header'
+import MonthSwitcher from './Monthswitch';
+import Header from './Header';
 import AddEventModal from './AddEventModal';
+import { useNavigate } from "react-router-dom";
+
 
 const months = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
+const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function expandEvents(events, currentMonth, currentYear) { 
   /*
@@ -39,20 +51,24 @@ function expandEvents(events, currentMonth, currentYear) {
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const date = new Date(d);
 
-      if (date.getMonth() !== currentMonth || date.getFullYear() !== currentYear) continue;
+      if (
+        date.getMonth() !== currentMonth ||
+        date.getFullYear() !== currentYear
+      )
+        continue;
 
       const isMatch =
-        repeat === 'Daily' ||
-        (repeat === 'Weekly' && date.getDay() === start.getDay()) ||
-        (repeat === 'Monthly' && date.getDate() === start.getDate()) ||
-        (repeat === 'Never' && date.toDateString() === start.toDateString());
+        repeat === "Daily" ||
+        (repeat === "Weekly" && date.getDay() === start.getDay()) ||
+        (repeat === "Monthly" && date.getDate() === start.getDate()) ||
+        (repeat === "Never" && date.toDateString() === start.toDateString());
 
       if (isMatch) {
         expanded.push({
-          date,           
+          date,
           name,
-          startTime,      
-          endTime
+          startTime,
+          endTime,
         });
       }
     }
@@ -61,8 +77,12 @@ function expandEvents(events, currentMonth, currentYear) {
   return expanded;
 }
 
-
-const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick, events = []) => {
+const getCalendarCells = (
+  startDayIndex = 2,
+  totalDays = 30,
+  onAddClick,
+  events = []
+) => {
   const cells = [];
 
   for (let i = 0; i < startDayIndex; i++) {
@@ -70,13 +90,14 @@ const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick, events 
   }
 
   for (let day = 1; day <= totalDays; day++) {
-    const dayEvents = events.filter(e => e.date.getDate() === day);
-    const eventDisplay = dayEvents.length > 0
-      ? [
-          { text: dayEvents[0].name, highlight: true },
-          { text: `${dayEvents[0].startTime} - ${dayEvents[0].endTime}` }
-        ]
-      : [{ text: 'X Event', highlight: true }, { text: 'xxx' }];
+    const dayEvents = events.filter((e) => e.date.getDate() === day);
+    const eventDisplay =
+      dayEvents.length > 0
+        ? [
+            { text: dayEvents[0].name, highlight: true },
+            { text: `${dayEvents[0].startTime} - ${dayEvents[0].endTime}` },
+          ]
+        : [{ text: "X Event", highlight: true }, { text: "xxx" }];
 
     cells.push(
       <Grid.Col span={1} key={day}>
@@ -92,7 +113,7 @@ const getCalendarCells = (startDayIndex = 2, totalDays = 30, onAddClick, events 
   return cells;
 };
 
-const Calendar = ({ goHome }) => {
+const Calendar = () => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -108,12 +129,21 @@ const Calendar = ({ goHome }) => {
   });
 
   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-  const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  const visibleEvents = expandEvents(events, date.getMonth(), date.getFullYear());
+  const daysInMonth = new Date(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    0
+  ).getDate();
+  const visibleEvents = expandEvents(
+    events,
+    date.getMonth(),
+    date.getFullYear()
+  );
 
   useEffect(() => {
     localStorage.setItem("events", JSON.stringify(events));
   }, [events]);
+  const navigate = useNavigate();
 
   const handlePrev = () => {
     setDate((prev) => {
@@ -132,22 +162,25 @@ const Calendar = ({ goHome }) => {
   };
 
   const openModalForDay = (day) => {
-    console.log('Opening modal for day', day);
+    console.log("Opening modal for day", day);
     setSelectedDay(day);
     setModalOpened(true);
   };
-  
 
   return (
     <>
-      <Header title="Project Name?" showHome={true} onHomeClick={goHome} />
-      <MonthSwitcher 
+      <Header
+        title="Project Name?"
+        showHome={true}
+        onHomeClick={() => navigate("/")}
+      />
+      <MonthSwitcher
         month={months[date.getMonth()]}
         year={date.getFullYear()}
         onPrev={handlePrev}
         onNext={handleNext}
       />
-      <Box style={{ width: '100%', padding: '1rem' }}>
+      <Box style={{ width: "100%", padding: "1rem" }}>
         <div style={{ padding: 16 }}>
           <Grid columns={7} gutter="xs">
             {daysOfWeek.map((day) => (
@@ -158,9 +191,14 @@ const Calendar = ({ goHome }) => {
               </Grid.Col>
             ))}
           </Grid>
-          
+
           <Grid columns={7} gutter="xs">
-          {getCalendarCells(firstDayOfMonth.getDay(), daysInMonth, openModalForDay, visibleEvents)}
+            {getCalendarCells(
+              firstDayOfMonth.getDay(),
+              daysInMonth,
+              openModalForDay,
+              visibleEvents
+            )}
           </Grid>
         </div>
       </Box>
@@ -177,6 +215,6 @@ const Calendar = ({ goHome }) => {
 
     </>
   );
-}
+};
 
 export default Calendar;

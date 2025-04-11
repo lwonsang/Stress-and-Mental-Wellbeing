@@ -10,11 +10,16 @@ import { useEffect } from "react";
 import Header from "./Header";
 import EventBox from "./EventBox";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 
 const WeeklyPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const passedDateStr = location.state?.selectedDate;
+  const passedDate = passedDateStr ? new Date(passedDateStr) : new Date();
 
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
@@ -345,17 +350,18 @@ const WeeklyPage = () => {
         onHomeClick={() => navigate("/")}
       />
       <div className="weekly-layout">
-        <WeeklyView
-          tasks={tasks}
-          events={events}
-          eventSlots={expandEventSlots(events)}
-          setTasks={setTasks}
-          setSelectedTask={setSelectedTask}
-          setShowModal={setShowModal}
-          setIsEditing={setIsEditing}
-          setSelectedEvent={setSelectedEvent}
-          setShowEventModal={setShowEventModal}
-        />
+      <WeeklyView
+        initialDate={passedDate}
+        tasks={tasks}
+        events={events}
+        eventSlots={expandEventSlots(events)}
+        setTasks={setTasks}
+        setSelectedTask={setSelectedTask}
+        setShowModal={setShowModal}
+        setIsEditing={setIsEditing}
+        setSelectedEvent={setSelectedEvent}
+        setShowEventModal={setShowEventModal}
+      />
         <WeeklyTaskPanel
           tasks={tasks}
           setTasks={setTasks}
@@ -641,6 +647,7 @@ const hours = Array.from(
 );
 
 const WeeklyView = ({
+  initialDate = new Date(),
   tasks,
   events,
   eventSlots,
@@ -658,7 +665,7 @@ const WeeklyView = ({
     return d;
   };
 
-  const [weekStart, setWeekStart] = useState(getStartOfWeek(new Date()));
+  const [weekStart, setWeekStart] = useState(getStartOfWeek(initialDate));
 
   const getDatesOfWeek = (start) => {
     const dates = [];

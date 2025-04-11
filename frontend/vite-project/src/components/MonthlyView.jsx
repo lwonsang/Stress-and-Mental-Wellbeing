@@ -83,10 +83,13 @@ function expandEvents(events, currentMonth, currentYear) {
 }
 
 const getCalendarCells = (
+  firstDayOfMonth,
   startDayIndex = 2,
   totalDays = 30,
   onAddClick,
-  events = []
+  events = [],
+  onDayClick,
+  taskDates = new Set()
 ) => {
   const cells = [];
 
@@ -95,6 +98,10 @@ const getCalendarCells = (
   }
 
   for (let day = 1; day <= totalDays; day++) {
+    const cellDate = new Date(firstDayOfMonth);
+    cellDate.setDate(day);
+    const cellKey = cellDate.toISOString().split("T")[0];
+
     const dayEvents = events.filter((e) => e.date.getDate() === day);
     const eventDisplay =
       dayEvents.length > 0
@@ -102,7 +109,9 @@ const getCalendarCells = (
             { text: dayEvents[0].name, highlight: true },
             { text: `${dayEvents[0].startTime} - ${dayEvents[0].endTime}` },
           ]
-        : [{ text: "X Event", highlight: true }, { text: "xxx" }];
+        : [];
+
+    const hasTask = taskDates.has(cellKey);
 
     cells.push(
       <Grid.Col span={1} key={day}>
@@ -110,6 +119,8 @@ const getCalendarCells = (
           dayNumber={day}
           events={eventDisplay}
           onAddClick={onAddClick}
+          onDayClick={onDayClick}
+          hasTasks={hasTask}
         />
       </Grid.Col>
     );
@@ -122,13 +133,32 @@ const Calendar = () => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem("tasks");
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const taskDates = new Set(
+    tasks.flatMap(t => 
+      (t.slots || []).map(s => {
+        const d = new Date(s.date);
+        return d.toISOString().split("T")[0]; 
+      })
+    )
+  );
+
+  const parseYmd = (str) => {
+    const [y, m, d] = str.split("-").map(Number);
+    return new Date(y, m - 1, d); 
+  };
+  
   const [events, setEvents] = useState(() => {
     const saved = localStorage.getItem("events");
     return saved
       ? JSON.parse(saved).map((e) => ({
           ...e,
-          startDate: new Date(e.startDate),
-          endDate: new Date(e.endDate),
+          startDate: parseYmd(e.startDate),
+          endDate: parseYmd(e.endDate),
         }))
       : [];
   });
@@ -148,10 +178,10 @@ const Calendar = () => {
   useEffect(() => {
     const eventsForStorage = events.map((e) => ({
       ...e,
-      startDate: formatYmd(new Date(e.startDate)),
-      endDate: formatYmd(new Date(e.endDate)),
+      startDate: formatYmd(e.startDate),
+      endDate: formatYmd(e.endDate),
     }));
-
+  
     localStorage.setItem("events", JSON.stringify(eventsForStorage));
   }, [events]);
 
@@ -205,12 +235,19 @@ const Calendar = () => {
           </Grid>
 
           <Grid columns={7} gutter="xs">
-            {getCalendarCells(
-              firstDayOfMonth.getDay(),
-              daysInMonth,
-              openModalForDay,
-              visibleEvents
-            )}
+          {getCalendarCells(
+            firstDayOfMonth,
+            firstDayOfMonth.getDay(),
+            daysInMonth,
+            openModalForDay,
+            visibleEvents,
+            (clickedDay) => {
+              const clickedDate = new Date(date.getFullYear(), date.getMonth(), clickedDay);
+              const formatted = clickedDate.toISOString().split("T")[0];
+              navigate("/weekly", { state: { selectedDate: formatted } });
+            },
+            taskDates
+          )}
           </Grid>
         </div>
       </Box>

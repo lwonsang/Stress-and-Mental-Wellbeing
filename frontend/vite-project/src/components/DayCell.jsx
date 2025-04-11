@@ -1,7 +1,7 @@
 import { Paper, Text, Button} from '@mantine/core';
 import { useState } from 'react';
 
-export function DayCell({ dayNumber, events = [], onAddClick}) {
+export function DayCell({ dayNumber, events = [], onAddClick, onDayClick, hasTasks }) {
   const [hovered, setHovered] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
 
@@ -9,15 +9,17 @@ export function DayCell({ dayNumber, events = [], onAddClick}) {
     <Paper
       withBorder
       shadow="xs"
+      onClick={() => onDayClick?.(dayNumber)}
       style={{
         aspectRatio: '1.707',
-        backgroundColor: 'rgba(0, 85, 255, 0.44)', 
+        backgroundColor: 'rgba(0, 85, 255, 0.44)',
         position: 'relative',
         overflow: 'hidden',
         padding: '8px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+        cursor: 'pointer', // indicate it's clickable
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -66,6 +68,24 @@ export function DayCell({ dayNumber, events = [], onAddClick}) {
           }}
         >
           <Button size="xs" onClick={() => onAddClick(dayNumber)}>Add</Button>
+        </div>
+      )}
+      {hasTasks && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: '#e53935', // bright red
+            color: 'white',
+            fontSize: '0.6rem',
+            padding: '2px 6px',
+            borderRadius: '12px',
+            fontWeight: 'bold',
+            lineHeight: 1,
+          }}
+        >
+          Todo
         </div>
       )}
     </Paper>

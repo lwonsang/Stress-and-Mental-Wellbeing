@@ -129,3 +129,21 @@
   font-size: 13px;
   color: #444;
 }
+
+.task-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.unplanned-panel {
+  background-color: #a5bfff;
+}
+
+.unplanned-item {
+  background-color: #fff0f0;
+  border-left: 6px solid #ff4d4d;
+  font-style: italic;
+  opacity: 0.9;
+}

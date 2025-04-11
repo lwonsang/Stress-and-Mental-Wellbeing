@@ -40,6 +40,7 @@
 .time-column,
 .day-column {
   display: flex;
+  position: relative;
   flex-direction: column;
 }
 
@@ -217,4 +218,20 @@
 .task-check {
   font-size: 18px;
   padding-left: 6px;
+}
+
+.event-box {
+  background-color: #e6edff;
+  color: #1a00ff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  padding: 4px 8px;
+  border-left: 5px solid #99b3ff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }

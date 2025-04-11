@@ -6,10 +6,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import Calendar from './components/MonthlyView'
+import { useEffect } from "react";
 
 function App() {
   const [page, setPage] = useState("home");
-
+  useEffect(() => {
+    setPage("home");
+  }, []);
   return (
     <div>
       {page === "home" && (

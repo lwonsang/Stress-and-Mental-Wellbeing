@@ -58,9 +58,9 @@ const Home = () => {
         id: "e1",
         name: "Daily Meeting",
         startTime: "10:00",
-        startDate: "2025-04-07T05:00:00.000Z",
-        endTime: "11:30",
-        endDate: "2025-04-11T05:00:00.000Z",
+        startDate: "2025-04-07",
+        endTime: "23:30",
+        endDate: "2025-04-11",
         repeat: "Daily",
       },
     ];
@@ -96,9 +96,9 @@ const Home = () => {
             endDate,
           });
 
-          if (repeat === "daily") current.setDate(current.getDate() + 1);
-          else if (repeat === "weekly") current.setDate(current.getDate() + 7);
-          else if (repeat === "monthly")
+          if (repeat === "Daily") current.setDate(current.getDate() + 1);
+          else if (repeat === "Weekly") current.setDate(current.getDate() + 7);
+          else if (repeat === "Monthly")
             current.setMonth(current.getMonth() + 1);
           else break;
         }
@@ -157,13 +157,27 @@ const Home = () => {
       let currentSize = 12;
       el.style.fontSize = `${currentSize}px`;
 
+      console.log(
+        `[AutoSizedEvent] Event "${event.name}" initial height: ${maxHeight}px`
+      );
+
       while (el.scrollHeight > maxHeight && currentSize > 6) {
         currentSize -= 1;
         el.style.fontSize = `${currentSize}px`;
       }
 
+      console.log(
+        `[AutoSizedEvent] Final font size for "${event.name}": ${currentSize}px`
+      );
+
       setFontSize(currentSize);
     }, [event.name]);
+
+    console.log(
+      `[AutoSizedEvent] Rendering "${event.name}" with duration: ${
+        event.duration
+      }, computed height: ${28 * parseFloat(event.duration || 1)}px`
+    );
 
     return (
       <div
@@ -194,7 +208,6 @@ const Home = () => {
           textOverflow: "ellipsis",
           whiteSpace: "normal",
           wordBreak: "break-word",
-          maxHeight: "56px",
           cursor: "pointer",
         }}
       >
@@ -263,10 +276,17 @@ const Home = () => {
                 <div className="readonly-cell time-label">{hour}</div>
 
                 {dateList.map((date, dIdx) => {
-                  const eventsAtTime = eventSlots.filter(
-                    (e) => e.date === date && e.time === hour
-                  );
+                  const parseTime = (timeStr) => {
+                    const [h, m] = timeStr.split(":").map(Number);
+                    return h * 60 + m;
+                  };
 
+                  const eventsAtTime = eventSlots.filter((e) => {
+                    if (e.date !== date) return false;
+                    const slotMin = parseTime(hour);
+                    const eventMin = parseTime(e.time);
+                    return Math.abs(eventMin - slotMin) <= 30;
+                  });
                   const slotsAtTime = allSlots.filter(
                     (s) => s.date === date && s.time === hour
                   );

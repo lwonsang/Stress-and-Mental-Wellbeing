@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Box, Grid, Text } from '@mantine/core';
-import { DayCell } from './DayCell';
-import MonthSwitcher from './Monthswitch';
-import Header from './Header';
-import AddEventModal from './AddEventModal';
+import { useState, useEffect } from "react";
+import { Box, Grid, Text } from "@mantine/core";
+import { DayCell } from "./DayCell";
+import { MonthSwitcher } from "./Monthswitch";
+import Header from "./Header";
+import AddEventModal from "./AddEventModal";
 import { useNavigate } from "react-router-dom";
-
 
 const months = [
   "Jan",
@@ -24,8 +23,14 @@ const months = [
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+function formatYmd(dateObj) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
-function expandEvents(events, currentMonth, currentYear) { 
+function expandEvents(events, currentMonth, currentYear) {
   /*
   Ideally (if there is nothing wrong), calling this will generate a list of events containing event name, start&end time
   e.g.,
@@ -119,13 +124,13 @@ const Calendar = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [events, setEvents] = useState(() => {
     const saved = localStorage.getItem("events");
-    return saved 
-    ? JSON.parse(saved).map(e => ({
-      ...e,
-      startDate: new Date(e.startDate),
-      endDate: new Date(e.endDate)
-    })) 
-    : [];
+    return saved
+      ? JSON.parse(saved).map((e) => ({
+          ...e,
+          startDate: new Date(e.startDate),
+          endDate: new Date(e.endDate),
+        }))
+      : [];
   });
 
   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -141,8 +146,15 @@ const Calendar = () => {
   );
 
   useEffect(() => {
-    localStorage.setItem("events", JSON.stringify(events));
+    const eventsForStorage = events.map((e) => ({
+      ...e,
+      startDate: formatYmd(new Date(e.startDate)),
+      endDate: formatYmd(new Date(e.endDate)),
+    }));
+
+    localStorage.setItem("events", JSON.stringify(eventsForStorage));
   }, [events]);
+
   const navigate = useNavigate();
 
   const handlePrev = () => {
@@ -209,10 +221,10 @@ const Calendar = () => {
         onCreate={(newEvent) =>
           setEvents((prev) => [
             ...prev,
-            {...newEvent, id: `e${prev.length + 1}`}
-          ])}
+            { ...newEvent, id: `e${prev.length + 1}` },
+          ])
+        }
       />
-
     </>
   );
 };

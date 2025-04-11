@@ -1,15 +1,28 @@
-import { useState } from 'react';
-import { Modal, Select, TextInput, Button, Box, Title, Group} from '@mantine/core';
-import { TimeInput } from '@mantine/dates'
+import { useState } from "react";
+import {
+  Modal,
+  Select,
+  TextInput,
+  Button,
+  Box,
+  Title,
+  Group,
+} from "@mantine/core";
+import { TimeInput } from "@mantine/dates";
 
-export default function AddEventModal({ opened, onClose, selectedDay, onCreate }) {
-  const [eventType, setEventType] = useState('');
-  const [eventName, setEventName] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [repeat, setRepeat] = useState('');
+export default function AddEventModal({
+  opened,
+  onClose,
+  selectedDay,
+  onCreate,
+}) {
+  const [eventType, setEventType] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [repeat, setRepeat] = useState("");
 
   return (
     <Modal
@@ -20,10 +33,14 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
       size="sm"
       withinPortal={false}
       classNames={{
-        content: 'addevent-modal-content'
+        content: "addevent-modal-content",
       }}
     >
-      <Title order={3} align="center" style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
+      <Title
+        order={3}
+        align="center"
+        style={{ fontWeight: "bold", marginBottom: "1rem" }}
+      >
         Create New Event:
       </Title>
 
@@ -31,7 +48,7 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
         <Select
           label="Event Type:"
           placeholder="Open dropdown menu..."
-          data={['Classes', 'Club activities', 'Extracurriculars', 'Other']}
+          data={["Classes", "Club activities", "Extracurriculars", "Other"]}
           value={eventType}
           onChange={setEventType}
           mt="xs"
@@ -52,7 +69,6 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           mt="sm"
         />
 
-        
         <TimeInput
           label="Start Time:"
           value={startTime}
@@ -68,7 +84,7 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           mt="sm"
           format="24"
         />
-        
+
         <TextInput
           label="End Date:"
           type="date"
@@ -76,11 +92,11 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           onChange={(e) => setEndDate(e.currentTarget.value)}
           mt="sm"
         />
-        
+
         <Select
           label="Repeats:"
           placeholder="Open dropdown menu..."
-          data={['Monthly', 'Weekly', 'Daily', 'Never']}
+          data={["Monthly", "Weekly", "Daily", "Never"]}
           value={repeat}
           onChange={setRepeat}
           mt="sm"
@@ -90,9 +106,9 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
             variant="outline"
             color="dark"
             style={{
-              backgroundColor: '#798592',
-              fontWeight: 'bold',
-              fontSize: '1.1rem'
+              backgroundColor: "#798592",
+              fontWeight: "bold",
+              fontSize: "1.1rem",
             }}
             onClick={onClose}
           >
@@ -101,23 +117,23 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
           <Button
             color="green"
             style={{
-              backgroundColor: '#35B200',
-              fontWeight: 'bold',
-              fontSize: '1.1rem'
+              backgroundColor: "#35B200",
+              fontWeight: "bold",
+              fontSize: "1.1rem",
             }}
             onClick={() => {
               const eventData = {
                 name: eventName || eventType,
-                startDate: new Date(startDate + 'T00:00'),
-                endDate: new Date(endDate + 'T00:00'),
+                startDate: new Date(startDate + "T00:00"),
+                endDate: new Date(endDate + "T00:00"),
                 startTime,
                 endTime,
-                repeat
+                repeat,
               };
-              onCreate(eventData); 
+              onCreate(eventData);
               onClose();
-              console.log("Add event: ", eventName, eventType, startTime, endTime, startDate, endDate, repeat)
-            }} >
+            }}
+          >
             Create
           </Button>
         </Group>

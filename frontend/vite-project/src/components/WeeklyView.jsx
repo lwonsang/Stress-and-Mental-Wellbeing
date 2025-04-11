@@ -105,7 +105,9 @@ const WeeklyPage = () => {
       let current = new Date(start);
 
       while (current <= end) {
-        const dateStr = current.toISOString().split("T")[0];
+        const dateStr = `${current.getFullYear()}-${(current.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}-${current.getDate().toString().padStart(2, "0")}`;
 
         const [startHour, startMin] = startTime.split(":").map(Number);
         const [endHour, endMin] = endTime.split(":").map(Number);
@@ -124,10 +126,10 @@ const WeeklyPage = () => {
           endDate,
         });
 
-        if (repeat === "never") break;
-        if (repeat === "daily") current.setDate(current.getDate() + 1);
-        else if (repeat === "weekly") current.setDate(current.getDate() + 7);
-        else if (repeat === "monthly") current.setMonth(current.getMonth() + 1);
+        if (repeat === "Never") break;
+        if (repeat === "Daily") current.setDate(current.getDate() + 1);
+        else if (repeat === "Weekly") current.setDate(current.getDate() + 7);
+        else if (repeat === "Monthly") current.setMonth(current.getMonth() + 1);
       }
     });
 
@@ -715,7 +717,11 @@ const WeeklyView = ({
         const m = minsInDay % 60;
         const d = new Date(dateStr);
         d.setDate(d.getDate() + offsetDays);
-        const newDate = d.toISOString().split("T")[0];
+        const newDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(d.getDate()).padStart(2, "0")}`;
+
         result.push(
           `${newDate}-${String(h).padStart(2, "0")}:${String(m).padStart(
             2,
@@ -725,6 +731,21 @@ const WeeklyView = ({
       }
 
       return result;
+    };
+
+    const doTimesOverlap = (date1, time1, dur1, date2, time2, dur2) => {
+      const toMinutes = (dateStr, timeStr) => {
+        const [h, m] = timeStr.split(":").map(Number);
+        const d = new Date(`${dateStr}T00:00`);
+        return d.getTime() + h * 60 * 60 * 1000 + m * 60 * 1000;
+      };
+
+      const start1 = toMinutes(date1, time1);
+      const end1 = start1 + dur1 * 60 * 60 * 1000;
+      const start2 = toMinutes(date2, time2);
+      const end2 = start2 + dur2 * 60 * 60 * 1000;
+
+      return Math.max(start1, start2) < Math.min(end1, end2);
     };
 
     const used = new Set();
@@ -737,18 +758,28 @@ const WeeklyView = ({
       });
     });
 
-    eventSlots.forEach((e) => {
-      getOccupiedKeys(e.date, e.time, parseFloat(e.duration || 1)).forEach(
-        (k) => used.add(k)
+    let hasEventConflict = false;
+    for (const e of eventSlots) {
+      const overlap = doTimesOverlap(
+        e.date,
+        e.time,
+        parseFloat(e.duration || 1),
+        targetDateStr,
+        targetTime,
+        parseFloat(task.workTime || 1)
       );
-    });
+      if (overlap) {
+        hasEventConflict = true;
+        break;
+      }
+    }
 
     const keysToCheck = getOccupiedKeys(
       targetDateStr,
       targetTime,
       parseFloat(task.workTime || 1)
     );
-    const isOccupied = keysToCheck.some((k) => used.has(k));
+    const isOccupied = hasEventConflict || keysToCheck.some((k) => used.has(k));
 
     if (isOccupied) {
       alert("Target time slot is occupied by another task or event.");
@@ -825,7 +856,18 @@ const WeeklyView = ({
                   onDrop={(e) => handleDrop(e, dateStr, hour)}
                 >
                   {eventSlots
-                    .filter((e) => e.date === dateStr && e.time === hour)
+                    .filter((e) => {
+                      if (e.date !== dateStr) return false;
+
+                      const parseTime = (t) => {
+                        const [h, m] = t.split(":").map(Number);
+                        return h * 60 + m;
+                      };
+
+                      const eventMinutes = parseTime(e.time);
+                      const slotMinutes = parseTime(hour);
+                      return Math.abs(eventMinutes - slotMinutes) <= 30;
+                    })
                     .map((event, idx) => (
                       <EventBox
                         key={`event-${event.id}-${idx}`}
@@ -836,6 +878,7 @@ const WeeklyView = ({
                         }}
                       />
                     ))}
+
                   {tasks.flatMap((task) =>
                     task.slots
                       ?.filter((s) => s.date === dateStr && s.time === hour)

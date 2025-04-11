@@ -108,8 +108,8 @@ export default function AddEventModal({ opened, onClose, selectedDay, onCreate }
             onClick={() => {
               const eventData = {
                 name: eventName || eventType,
-                startDate,
-                endDate,
+                startDate: new Date(startDate + 'T00:00'),
+                endDate: new Date(endDate + 'T00:00'),
                 startTime,
                 endTime,
                 repeat

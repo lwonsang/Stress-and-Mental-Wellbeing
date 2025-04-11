@@ -56,10 +56,10 @@ const Home = ({ goToWeekly, goToMonthly }) => {
         id: "e1",
         name: "Daily Meeting",
         startTime: "10:00",
-        startDate: "2025-04-07",
+        startDate: "2025-04-07T05:00:00.000Z",
         endTime: "11:30",
-        endDate: "2025-04-11",
-        repeat: "daily",
+        endDate: "2025-04-11T05:00:00.000Z",
+        repeat: "Daily",
       },
     ];
     const loadedEvents = storedEvents

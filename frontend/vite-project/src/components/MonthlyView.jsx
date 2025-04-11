@@ -31,9 +31,10 @@ function expandEvents(events, currentMonth, currentYear) {
   for (const event of events) {
     const { startDate, endDate, startTime, endTime, name, repeat } = event;
 
-    const start = new Date(startDate + 'T00:00');
-    const end = new Date(endDate + 'T00:00');
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
+    console.log("start: ", start);
 
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const date = new Date(d);

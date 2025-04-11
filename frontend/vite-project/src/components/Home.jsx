@@ -266,7 +266,7 @@ const Home = () => {
               <div className="readonly-cell empty-cell" />
               {dateList.map((_, i) => (
                 <div key={i} className="readonly-cell day-label">
-                  m{days[i]}
+                  {days[i]}
                 </div>
               ))}
             </div>

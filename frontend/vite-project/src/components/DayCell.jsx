@@ -67,7 +67,15 @@ export function DayCell({ dayNumber, events = [], onAddClick, onDayClick, hasTas
             transform: 'translateX(-50%)',
           }}
         >
-          <Button size="xs" onClick={() => onAddClick(dayNumber)}>Add</Button>
+          <Button
+            size="xs"
+            onClick={(e) => {
+              e.stopPropagation(); 
+              onAddClick(dayNumber);
+            }}
+          >
+            Add
+          </Button>
         </div>
       )}
       {hasTasks && (

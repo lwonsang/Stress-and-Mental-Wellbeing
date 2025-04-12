@@ -129,7 +129,7 @@ const WeeklyPage = () => {
           ? 24 * 60 - startTimeMin + endTimeMin
           : endTimeMin - startTimeMin;
 
-        remainingMin = Math.max(30, remainingMin); 
+        remainingMin = Math.max(30, remainingMin);
 
         let dayStartMin = startTimeMin;
         let segmentDate = new Date(current);
@@ -160,7 +160,7 @@ const WeeklyPage = () => {
 
           remainingMin -= segmentMin;
           segmentDate.setDate(segmentDate.getDate() + 1);
-          dayStartMin = 0; 
+          dayStartMin = 0;
         }
 
         if (repeat === "Never") break;
@@ -760,6 +760,14 @@ const WeeklyView = ({
 
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
+
+    const isDuplicateSlot = task.slots?.some(
+      (s) => s.date === targetDateStr && s.time === targetTime
+    );
+    if (isDuplicateSlot) {
+      alert("Task already has a slot at this time.");
+      return;
+    }
 
     const getOccupiedKeys = (dateStr, startTime, durationHours) => {
       const result = [];

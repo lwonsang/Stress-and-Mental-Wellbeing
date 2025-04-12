@@ -12,7 +12,6 @@ import EventBox from "./EventBox";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-
 const WeeklyPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
@@ -91,8 +90,13 @@ const WeeklyPage = () => {
   useEffect(() => {
     const eventSlots = expandEventSlots(events);
     const cleanedTasks = removeTaskConflicts(tasks, eventSlots);
-    setTasks(cleanedTasks);
-  }, [events]);
+
+    const changed =
+      JSON.stringify(tasks.map((t) => t.slots)) !==
+      JSON.stringify(cleanedTasks.map((t) => t.slots));
+
+    if (changed) setTasks(cleanedTasks);
+  }, [events, tasks]);
 
   useEffect(() => {
     localStorage.setItem("events", JSON.stringify(events));
@@ -102,7 +106,7 @@ const WeeklyPage = () => {
     const eventSlots = [];
 
     events.forEach((event) => {
-      const { id, name, startTime, startDate, endTime, endDate, repeat } =
+      const { id, name, startTime, endTime, startDate, endDate, repeat } =
         event;
 
       const start = new Date(`${startDate}T${startTime}`);
@@ -110,26 +114,54 @@ const WeeklyPage = () => {
       let current = new Date(start);
 
       while (current <= end) {
-        const dateStr = `${current.getFullYear()}-${(current.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${current.getDate().toString().padStart(2, "0")}`;
+        const currentStartTime = startTime;
+        const currentEndTime = endTime;
 
-        const [startHour, startMin] = startTime.split(":").map(Number);
-        const [endHour, endMin] = endTime.split(":").map(Number);
-        let durationHours =
-          (endHour * 60 + endMin - (startHour * 60 + startMin)) / 60;
-        durationHours = Math.max(1, durationHours);
-        eventSlots.push({
-          id,
-          name,
-          date: dateStr,
-          time: startTime,
-          duration: durationHours,
-          endTime,
-          repeat,
-          startDate,
-          endDate,
-        });
+        const startTimeMin =
+          parseInt(currentStartTime.split(":")[0]) * 60 +
+          parseInt(currentStartTime.split(":")[1]);
+        const endTimeMin =
+          parseInt(currentEndTime.split(":")[0]) * 60 +
+          parseInt(currentEndTime.split(":")[1]);
+        const isOvernight = endTimeMin <= startTimeMin;
+
+        let remainingMin = isOvernight
+          ? 24 * 60 - startTimeMin + endTimeMin
+          : endTimeMin - startTimeMin;
+
+        remainingMin = Math.max(30, remainingMin); 
+
+        let dayStartMin = startTimeMin;
+        let segmentDate = new Date(current);
+
+        while (remainingMin > 0) {
+          const segmentDateStr = segmentDate.toISOString().split("T")[0];
+          const segmentStartHour = Math.floor(dayStartMin / 60);
+          const segmentStartMin = dayStartMin % 60;
+          const segmentTime = `${segmentStartHour
+            .toString()
+            .padStart(2, "0")}:${segmentStartMin.toString().padStart(2, "0")}`;
+
+          const maxMinutesThisDay = 24 * 60 - dayStartMin;
+          const segmentMin = Math.min(remainingMin, maxMinutesThisDay);
+          const segmentDuration = segmentMin / 60;
+
+          eventSlots.push({
+            id,
+            name,
+            date: segmentDateStr,
+            time: segmentTime,
+            duration: segmentDuration,
+            endTime,
+            repeat,
+            startDate,
+            endDate,
+          });
+
+          remainingMin -= segmentMin;
+          segmentDate.setDate(segmentDate.getDate() + 1);
+          dayStartMin = 0; 
+        }
 
         if (repeat === "Never") break;
         if (repeat === "Daily") current.setDate(current.getDate() + 1);
@@ -145,9 +177,10 @@ const WeeklyPage = () => {
     const blockedKeys = new Set(
       eventSlots.flatMap((e) => {
         const [sh, sm] = e.time.split(":").map(Number);
+        const roundedStartMin = Math.round((sh * 60 + sm) / 30) * 30;
         const blocks = [];
         for (let i = 0; i < Math.ceil(e.duration * 2); i++) {
-          const totalMin = sh * 60 + sm + i * 30;
+          const totalMin = roundedStartMin + i * 30;
           const h = Math.floor(totalMin / 60);
           const m = totalMin % 60;
           blocks.push(
@@ -161,9 +194,25 @@ const WeeklyPage = () => {
     );
 
     return taskList.map((task) => {
-      const hasConflict = (task.slots || []).some((slot) =>
-        blockedKeys.has(`${slot.date}-${slot.time}`)
-      );
+      const unit = parseFloat(task.workTime || 1);
+      const halfHourBlocks = Math.ceil(unit * 2);
+
+      const hasConflict = (task.slots || []).some((slot) => {
+        const [sh, sm] = slot.time.split(":").map(Number);
+        const roundedStartMin = Math.round((sh * 60 + sm) / 30) * 30;
+
+        for (let i = 0; i < halfHourBlocks; i++) {
+          const totalMin = roundedStartMin + i * 30;
+          const h = Math.floor(totalMin / 60);
+          const m = totalMin % 60;
+          const key = `${slot.date}-${h.toString().padStart(2, "0")}:${m
+            .toString()
+            .padStart(2, "0")}`;
+          if (blockedKeys.has(key)) return true;
+        }
+
+        return false;
+      });
 
       return {
         ...task,
@@ -209,40 +258,41 @@ const WeeklyPage = () => {
     tasks.forEach((task) => {
       if (!task.slots || !task.slots.length) return;
 
-      const unitStr = String(task.workTime || "")
-        .replace("h", "")
-        .trim();
-      const unit = parseFloat(unitStr) || 1;
+      const unit = parseFloat(task.workTime || 1);
+      const blocks = Math.ceil(unit * 2);
 
       task.slots.forEach((slot) => {
-        const [startHour, startMin] = slot.time.split(":").map(Number);
+        const [h, m] = slot.time.split(":").map(Number);
+        const roundedStartMin = Math.round((h * 60 + m) / 30) * 30;
 
-        const halfHoursCount = Math.ceil(unit * 2);
-
-        for (let i = 0; i < halfHoursCount; i++) {
-          const hh = startHour + Math.floor((startMin + i * 30) / 60);
-          const mm = (startMin + i * 30) % 60;
-          const timeStr = `${hh.toString().padStart(2, "0")}:${mm
-            .toString()
-            .padStart(2, "0")}`;
-          used.add(`${slot.date}-${timeStr}`);
+        for (let i = 0; i < blocks; i++) {
+          const totalMin = roundedStartMin + i * 30;
+          const hh = Math.floor(totalMin / 60);
+          const mm = totalMin % 60;
+          used.add(
+            `${slot.date}-${hh.toString().padStart(2, "0")}:${mm
+              .toString()
+              .padStart(2, "0")}`
+          );
         }
       });
     });
 
-    const eventSlots = expandEventSlots(events);
-    eventSlots.forEach((e) => {
-      const [startHour, startMin] = e.time.split(":").map(Number);
+    expandEventSlots(events).forEach((e) => {
+      const [h, m] = e.time.split(":").map(Number);
+      const roundedStartMin = Math.round((h * 60 + m) / 30) * 30;
       const duration = parseFloat(e.duration || 1);
-      const totalHalfHours = Math.ceil(duration * 2);
+      const blocks = Math.ceil(duration * 2);
 
-      for (let i = 0; i < totalHalfHours; i++) {
-        const hour = startHour + Math.floor((startMin + i * 30) / 60);
-        const minute = (startMin + i * 30) % 60;
-        const timeStr = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        used.add(`${e.date}-${timeStr}`);
+      for (let i = 0; i < blocks; i++) {
+        const totalMin = roundedStartMin + i * 30;
+        const hh = Math.floor(totalMin / 60);
+        const mm = totalMin % 60;
+        used.add(
+          `${e.date}-${hh.toString().padStart(2, "0")}:${mm
+            .toString()
+            .padStart(2, "0")}`
+        );
       }
     });
 
@@ -350,18 +400,18 @@ const WeeklyPage = () => {
         onHomeClick={() => navigate("/")}
       />
       <div className="weekly-layout">
-      <WeeklyView
-        initialDate={passedDate}
-        tasks={tasks}
-        events={events}
-        eventSlots={expandEventSlots(events)}
-        setTasks={setTasks}
-        setSelectedTask={setSelectedTask}
-        setShowModal={setShowModal}
-        setIsEditing={setIsEditing}
-        setSelectedEvent={setSelectedEvent}
-        setShowEventModal={setShowEventModal}
-      />
+        <WeeklyView
+          initialDate={passedDate}
+          tasks={tasks}
+          events={events}
+          eventSlots={expandEventSlots(events)}
+          setTasks={setTasks}
+          setSelectedTask={setSelectedTask}
+          setShowModal={setShowModal}
+          setIsEditing={setIsEditing}
+          setSelectedEvent={setSelectedEvent}
+          setShowEventModal={setShowEventModal}
+        />
         <WeeklyTaskPanel
           tasks={tasks}
           setTasks={setTasks}

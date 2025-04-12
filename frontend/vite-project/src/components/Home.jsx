@@ -70,39 +70,72 @@ const Home = () => {
 
     const expandEventSlots = (events) => {
       const slots = [];
+
       events.forEach((event) => {
         const { id, name, startTime, endTime, startDate, endDate, repeat } =
           event;
-        const [startHour, startMin] = startTime.split(":").map(Number);
-        const [endHour, endMin] = endTime.split(":").map(Number);
-        let duration =
-          (endHour * 60 + endMin - (startHour * 60 + startMin)) / 60;
-        duration = Math.max(1, duration);
 
-        let current = new Date(`${startDate}T00:00`);
-        const end = new Date(`${endDate}T23:59`);
+        const start = new Date(`${startDate}T${startTime}`);
+        const end = new Date(`${endDate}T${endTime}`);
+        let current = new Date(start);
 
         while (current <= end) {
-          const dateStr = current.toISOString().split("T")[0];
-          slots.push({
-            id,
-            name,
-            date: dateStr,
-            time: startTime,
-            endTime: endTime,
-            duration,
-            repeat,
-            startDate,
-            endDate,
-          });
+          const startTimeMin =
+            parseInt(startTime.split(":")[0]) * 60 +
+            parseInt(startTime.split(":")[1]);
+          const endTimeMin =
+            parseInt(endTime.split(":")[0]) * 60 +
+            parseInt(endTime.split(":")[1]);
+          const isOvernight = endTimeMin <= startTimeMin;
 
+          let remainingMin = isOvernight
+            ? 24 * 60 - startTimeMin + endTimeMin
+            : endTimeMin - startTimeMin;
+
+          remainingMin = Math.max(30, remainingMin); 
+
+          let dayStartMin = startTimeMin;
+          let segmentDate = new Date(current);
+
+          while (remainingMin > 0) {
+            const segmentDateStr = segmentDate.toISOString().split("T")[0];
+            const segmentStartHour = Math.floor(dayStartMin / 60);
+            const segmentStartMin = dayStartMin % 60;
+            const segmentTime = `${segmentStartHour
+              .toString()
+              .padStart(2, "0")}:${segmentStartMin
+              .toString()
+              .padStart(2, "0")}`;
+
+            const maxMinutesThisDay = 24 * 60 - dayStartMin;
+            const segmentMin = Math.min(remainingMin, maxMinutesThisDay);
+            const segmentDuration = segmentMin / 60;
+
+            slots.push({
+              id,
+              name,
+              date: segmentDateStr,
+              time: segmentTime,
+              duration: segmentDuration,
+              endTime,
+              repeat,
+              startDate,
+              endDate,
+            });
+
+            remainingMin -= segmentMin;
+            segmentDate.setDate(segmentDate.getDate() + 1);
+            dayStartMin = 0;
+          }
+
+          if (repeat === "Never") break;
           if (repeat === "Daily") current.setDate(current.getDate() + 1);
           else if (repeat === "Weekly") current.setDate(current.getDate() + 7);
           else if (repeat === "Monthly")
             current.setMonth(current.getMonth() + 1);
-          else break;
         }
       });
+
       return slots;
     };
 
@@ -111,25 +144,40 @@ const Home = () => {
     const blockedKeys = new Set(
       eventSlots.flatMap((e) => {
         const [sh, sm] = e.time.split(":").map(Number);
-        const blocks = [];
+        const roundedStartMin = Math.round((sh * 60 + sm) / 30) * 30;
+        const keys = [];
         for (let i = 0; i < Math.ceil(e.duration * 2); i++) {
-          const totalMin = sh * 60 + sm + i * 30;
+          const totalMin = roundedStartMin + i * 30;
           const h = Math.floor(totalMin / 60);
           const m = totalMin % 60;
-          blocks.push(
+          keys.push(
             `${e.date}-${h.toString().padStart(2, "0")}:${m
               .toString()
               .padStart(2, "0")}`
           );
         }
-        return blocks;
+        return keys;
       })
     );
 
     const cleanedTasks = loadedTasks.map((task) => {
-      const hasConflict = (task.slots || []).some((slot) =>
-        blockedKeys.has(`${slot.date}-${slot.time}`)
-      );
+      const unit = parseFloat(task.workTime || 1);
+      const blocks = Math.ceil(unit * 2);
+
+      const hasConflict = (task.slots || []).some((slot) => {
+        const [h, m] = slot.time.split(":").map(Number);
+        const roundedStartMin = Math.round((h * 60 + m) / 30) * 30;
+        for (let i = 0; i < blocks; i++) {
+          const totalMin = roundedStartMin + i * 30;
+          const hh = Math.floor(totalMin / 60);
+          const mm = totalMin % 60;
+          const key = `${slot.date}-${hh.toString().padStart(2, "0")}:${mm
+            .toString()
+            .padStart(2, "0")}`;
+          if (blockedKeys.has(key)) return true;
+        }
+        return false;
+      });
 
       return {
         ...task,
@@ -142,6 +190,7 @@ const Home = () => {
     localStorage.setItem("events", JSON.stringify(loadedEvents));
     setEventSlots(eventSlots);
   }, []);
+
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
 

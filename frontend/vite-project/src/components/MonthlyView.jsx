@@ -129,10 +129,14 @@ const getCalendarCells = (
   return cells;
 };
 
-const Calendar = () => {
+const Calendar = ({user}) => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
     return saved ? JSON.parse(saved) : [];
@@ -214,8 +218,12 @@ const Calendar = () => {
       <Header
         title="Project Name?"
         showHome={true}
+        user={user}
         onHomeClick={() => navigate("/")}
+        rightButtonText="Edit Existing Events"
+        onRightButtonClick={() => setEditModalOpen(true)}
       />
+
       <MonthSwitcher
         month={months[date.getMonth()]}
         year={date.getFullYear()}
@@ -253,15 +261,107 @@ const Calendar = () => {
       </Box>
       <AddEventModal
         opened={modalOpened}
-        onClose={() => setModalOpened(false)}
+        onClose={() => {
+          setModalOpened(false);
+          setEditingEvent(null);
+        }}
         selectedDay={selectedDay}
-        onCreate={(newEvent) =>
-          setEvents((prev) => [
-            ...prev,
-            { ...newEvent, id: `e${prev.length + 1}` },
-          ])
-        }
+        initialEvent={editingEvent}
+        onCreate={(newEvent) => {
+          if (editingEvent) {
+            // Update existing event
+            setEvents(prev =>
+              prev.map(e =>
+                e.id === editingEvent.id ? { ...newEvent, id: editingEvent.id } : e
+              )
+            );
+          } else {
+            // Add new event
+            setEvents((prev) => [
+              ...prev,
+              { ...newEvent, id: `e${prev.length + 1}` },
+            ]);
+          }
+
+          setModalOpened(false);
+          setEditingEvent(null);
+        }}
       />
+      {editModalOpen && (
+        <div className="task-modal">
+          <div className="task-modal-content"
+            style={{
+              maxHeight: "70vh",
+              overflowY: "auto",
+              paddingRight: "12px"
+            }}
+          >
+            <h3>Edit Events</h3>
+
+            {events.length === 0 && <p>No events yet.</p>}
+
+            {events.map((event, index) => (
+              <div key={event.id || index} style={{ marginBottom: "12px", borderBottom: "1px solid #ccc", paddingBottom: "8px" }}>
+                <strong>{event.name}</strong>
+                <p>
+                  {formatYmd(event.startDate)} {event.startTime} — {formatYmd(event.endDate)} {event.endTime}
+                </p>
+                <p>Repeat: {event.repeat}</p>
+
+                <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
+                  <button
+                     onClick={() => {
+                      setEditModalOpen(false); // 👈 close the list modal first
+                      setTimeout(() => {
+                        setEditingEvent(event);
+                        setSelectedDay(null);
+                        setModalOpened(true);
+                      }, 0); // 👈 slight delay ensures the other modal unmounts before opening
+                    }}
+                    style={{
+                      backgroundColor: "#1976d2",
+                      color: "white",
+                      border: "none",
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const confirmDelete = window.confirm(`Delete event "${event.name}"?`);
+                      if (confirmDelete) {
+                        setEvents(prev => prev.filter((e, i) => i !== index));
+                      }
+                    }}
+                    style={{
+                      backgroundColor: "#e53935",
+                      color: "white",
+                      border: "none",
+                      padding: "4px 8px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            <button
+              className="modal-button close-btn"
+              onClick={() => setEditModalOpen(false)}
+              style={{ marginTop: "16px" }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

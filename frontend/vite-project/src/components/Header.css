@@ -47,3 +47,10 @@
 .header-button:hover {
   background-color: #1a75ff;
 }
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+  flex-wrap: wrap;
+}

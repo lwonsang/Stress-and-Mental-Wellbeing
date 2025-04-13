@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 
 const Header = ({
   title,
+  user,
   showHome,
   onHomeClick,
   monthButtonText,
   rightButtonText,
   onMonthButtonClick,
-  onRightButtonClick,
+  onRightButtonClick  
 }) => {
   const navigate = useNavigate();
 
@@ -35,7 +36,13 @@ const Header = ({
         )}
         <div className="header-title">{title}</div>
       </div>
-
+      
+      {user && (
+          <div className="header-user">
+            Hi, {user.username}
+          </div>
+      )}
+      
       <div className="header-right">
         {monthButtonText && (
           <button className="header-button" onClick={onMonthButtonClick}>

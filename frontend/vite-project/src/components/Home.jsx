@@ -16,7 +16,7 @@ const getStartOfWeek = () => {
   return now;
 };
 
-const Home = () => {
+const Home = ({user}) => {
   const [tasks, setTasks] = useState([]);
   const [weekStart] = useState(getStartOfWeek());
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -300,6 +300,7 @@ const Home = () => {
     <div className="home-page">
       <Header
         title="Project Name?"
+        user={user}
         monthButtonText="Edit Events"
         rightButtonText="Add Tasks & Edit Schedule"
         onMonthButtonClick={() => navigate("/monthly")}

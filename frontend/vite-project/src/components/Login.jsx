@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { Title, MantineProvider} from '@mantine/core';
 
-
-export default function Login() {
+export default function Login({ setUser }) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -11,7 +12,6 @@ export default function Login() {
 
   const getAccounts = () => JSON.parse(localStorage.getItem('accounts')) || [];
   const saveAccounts = (accounts) => localStorage.setItem('accounts', JSON.stringify(accounts));
-  const navigate = useNavigate();
 
   const handleLogin = () => {
     if (!username || !password) {
@@ -21,11 +21,10 @@ export default function Login() {
     const accounts = getAccounts();
     const found = accounts.find(acc => acc.username === username && acc.password === password);
     if (found) {
-      localStorage.setItem('currentUser', JSON.stringify({ username }));
-      setMessage('Login successful!');
-      
+      const user = { username };
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      setUser(user); 
       navigate("/");
-      console.log("Navigating");
     } else {
       setMessage('Invalid username or password');
     }
@@ -55,13 +54,22 @@ export default function Login() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      backgroundColor: '#fff'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        gap: '40px' // spacing between intro and login box
+      }}
+    >
+      <MantineProvider>
+        <div style={{ maxWidth: '320px', textAlign: 'left' }}>
+          <Title order={2}>
+            <strong>Well-being Task Management Website:</strong> Add your tasks here and arrange them in a single click!
+          </Title>
+        </div>
+      </MantineProvider>
       <div style={{
         maxWidth: 300,
         width: '100%',
@@ -97,7 +105,7 @@ export default function Login() {
         </button>
         <div style={{ marginTop: 10, fontSize: 14 }}>
           {mode === 'login' ? (
-            <>Don’t have an account? <span onClick={() => setMode('register')} style={{ color: 'blue', cursor: 'pointer' }}>Register here!</span></>
+            <>Don't have an account? <span onClick={() => setMode('register')} style={{ color: 'blue', cursor: 'pointer' }}>Register here!</span></>
           ) : (
             <>Already have an account? <span onClick={() => setMode('login')} style={{ color: 'blue', cursor: 'pointer' }}>Login here!</span></>
           )}

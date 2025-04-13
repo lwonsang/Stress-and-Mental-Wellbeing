@@ -12,6 +12,7 @@ import Login from "./components/Login";
 
 function App() {
   const isProd = import.meta.env.MODE === "production";
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("currentUser")));
   
   useEffect(() => {
     const existing = JSON.parse(localStorage.getItem("accounts")) || [];
@@ -26,19 +27,10 @@ function App() {
 
     <Router basename={isProd ? "/Stress-and-Mental-Wellbeing" : "/"}>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={localStorage.getItem("currentUser") ? <Home /> : <Login />}
-        />
-        <Route
-          path="/weekly"
-          element={localStorage.getItem("currentUser") ? <WeeklyPage /> : <Login />}
-        />
-        <Route
-          path="/monthly"
-          element={localStorage.getItem("currentUser") ? <Calendar /> : <Login />}
-        />
+        <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/" element={user ? <Home user={user} /> : <Login setUser={setUser} />} />
+        <Route path="/weekly" element={user ? <WeeklyPage user={user} /> : <Login setUser={setUser} />} />
+        <Route path="/monthly" element={user ? <Calendar user={user} /> : <Login setUser={setUser} />} />
       </Routes>
     </Router>
   );

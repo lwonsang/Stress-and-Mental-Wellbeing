@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import {
   Modal,
   Select,
@@ -15,6 +16,7 @@ export default function AddEventModal({
   onClose,
   selectedDay,
   onCreate,
+  initialEvent,
 }) {
   const [eventType, setEventType] = useState("");
   const [eventName, setEventName] = useState("");
@@ -23,6 +25,25 @@ export default function AddEventModal({
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [repeat, setRepeat] = useState("");
+
+  useEffect(() => {
+    if (initialEvent) {
+      setEventName(initialEvent.name || "");
+      setStartDate(formatDate(initialEvent.startDate));
+      setEndDate(formatDate(initialEvent.endDate));
+      setStartTime(initialEvent.startTime || "");
+      setEndTime(initialEvent.endTime || "");
+      setRepeat(initialEvent.repeat || "");
+      setEventType(""); 
+    } else if (selectedDay instanceof Date && !isNaN(selectedDay)) {
+      const todayStr = selectedDay.toISOString().split("T")[0];
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+    }
+  }, [initialEvent, selectedDay]);
+
+  const formatDate = (date) =>
+    date instanceof Date ? date.toISOString().split("T")[0] : "";  
 
   return (
     <Modal
@@ -36,13 +57,10 @@ export default function AddEventModal({
         content: "addevent-modal-content",
       }}
     >
-      <Title
-        order={3}
-        align="center"
-        style={{ fontWeight: "bold", marginBottom: "1rem" }}
-      >
-        Create New Event:
+      <Title order={3} align="center" style={{ fontWeight: "bold", marginBottom: "1rem" }}>
+        {initialEvent ? "Edit Event" : "Create New Event"}
       </Title>
+
 
       <Box>
         <Select
@@ -129,12 +147,13 @@ export default function AddEventModal({
                 startTime,
                 endTime,
                 repeat,
+                ...(initialEvent?.id && { id: initialEvent.id }) 
               };
               onCreate(eventData);
               onClose();
             }}
           >
-            Create
+            {initialEvent ? "Update" : "Create"}
           </Button>
         </Group>
       </Box>

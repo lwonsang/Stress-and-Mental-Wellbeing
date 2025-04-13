@@ -12,7 +12,7 @@ import EventBox from "./EventBox";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const WeeklyPage = () => {
+const WeeklyPage = ({user}) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const navigate = useNavigate();
@@ -394,6 +394,7 @@ const WeeklyPage = () => {
     <>
       <Header
         title="Project Name?"
+        user={user}
         showHome={true}
         rightButtonText="Edit Events"
         onRightButtonClick={() => navigate("/monthly")}

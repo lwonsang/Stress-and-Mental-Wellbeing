@@ -216,7 +216,7 @@ const Calendar = ({user}) => {
   return (
     <>
       <Header
-        title="Project Name?"
+        title="WeekPlanr"
         showHome={true}
         user={user}
         onHomeClick={() => navigate("/")}

@@ -393,7 +393,7 @@ const WeeklyPage = ({user}) => {
   return (
     <>
       <Header
-        title="Project Name?"
+        title="WeekPlanr"
         user={user}
         showHome={true}
         rightButtonText="Edit Events"

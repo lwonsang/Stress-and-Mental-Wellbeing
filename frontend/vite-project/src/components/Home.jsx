@@ -16,7 +16,7 @@ const getStartOfWeek = () => {
   return now;
 };
 
-const Home = ({user}) => {
+const Home = ({ user }) => {
   const [tasks, setTasks] = useState([]);
   const [weekStart] = useState(getStartOfWeek());
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -92,7 +92,7 @@ const Home = ({user}) => {
             ? 24 * 60 - startTimeMin + endTimeMin
             : endTimeMin - startTimeMin;
 
-          remainingMin = Math.max(30, remainingMin); 
+          remainingMin = Math.max(30, remainingMin);
 
           let dayStartMin = startTimeMin;
           let segmentDate = new Date(current);
@@ -299,7 +299,7 @@ const Home = ({user}) => {
   return (
     <div className="home-page">
       <Header
-        title="Project Name?"
+        title="WeekPlanr"
         user={user}
         monthButtonText="Edit Events"
         rightButtonText="Add Tasks & Edit Schedule"
@@ -314,11 +314,17 @@ const Home = ({user}) => {
           <div className="readonly-grid">
             <div className="readonly-row">
               <div className="readonly-cell empty-cell" />
-              {dateList.map((_, i) => (
-                <div key={i} className="readonly-cell day-label">
-                  {days[i]}
-                </div>
-              ))}
+              {dateList.map((dateStr, i) => {
+                const date = new Date(dateStr);
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                return (
+                  <div key={i} className="readonly-cell day-label">
+                    {days[i]+" "}
+                    {month}/{day}
+                  </div>
+                );
+              })}
             </div>
 
             {hours.map((hour, hIdx) => (

@@ -1,5 +1,6 @@
 import React from "react";
 import "./Header.css";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({
   title,
@@ -10,6 +11,13 @@ const Header = ({
   onMonthButtonClick,
   onRightButtonClick,
 }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    navigate("/login");
+  };
+
   return (
     <div className="home-header">
       <div className="header-left">
@@ -39,6 +47,13 @@ const Header = ({
             {rightButtonText}
           </button>
         )}
+        <button
+          className="header-button"
+          onClick={handleLogout}
+          style={{ marginLeft: 8 }}
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

@@ -463,7 +463,18 @@ const WeeklyPage = ({ user }) => {
                   slots: [],
                 },
               ];
-              setTasks((prev) => [...prev, ...canvasTasks]);
+
+              setTasks((prev) => {
+                const existingIds = new Set(prev.map((t) => t.id));
+                const filtered = canvasTasks.filter(
+                  (t) => !existingIds.has(t.id)
+                );
+                if (filtered.length === 0) {
+                  alert("No new tasks to add.");
+                  return prev;
+                }
+                return [...prev, ...filtered];
+              });
             }}
           >
             Fetch Tasks from Canvas

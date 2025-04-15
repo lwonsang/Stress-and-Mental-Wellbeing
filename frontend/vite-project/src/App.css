@@ -1,10 +1,13 @@
+body {
+  background-color: white;
+}
+
 #root {
   width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 
 .logo {
   height: 6em;
@@ -43,11 +46,8 @@
 }
 
 .addevent-modal-content {
-  background-color: #A1ACD5;
+  background-color: #a1acd5;
   border-radius: 0;
   padding: 24px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
 }
-
-
-

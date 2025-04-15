@@ -2,10 +2,17 @@ const EventBox = ({ event, onClick }) => {
   const hours = parseFloat(event.duration || 1);
   const height = `${28 * hours - 4}px`;
 
+  const maxLength = 14;
+  const displayName =
+    event.name.length > maxLength
+      ? event.name.slice(0, maxLength - 1) + "…"
+      : event.name;
+
   return (
     <div
       className="event-box"
       onClick={onClick}
+      title={event.name}
       style={{
         height,
         marginBottom: "4px",
@@ -27,7 +34,7 @@ const EventBox = ({ event, onClick }) => {
         textAlign: "center",
       }}
     >
-      <div style={{ fontWeight: "600" }}>{event.name}</div>
+      <div style={{ fontWeight: "600" }}>{displayName}</div>
     </div>
   );
 };

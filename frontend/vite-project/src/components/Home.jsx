@@ -301,7 +301,7 @@ const Home = ({ user }) => {
       <Header
         title="WeekPlanr"
         user={user}
-        monthButtonText="Edit Events"
+        monthButtonText="Add Events"
         rightButtonText="Add Tasks & Edit Schedule"
         onMonthButtonClick={() => navigate("/monthly")}
         onRightButtonClick={() => navigate("/weekly")}

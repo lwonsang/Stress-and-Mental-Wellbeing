@@ -396,7 +396,7 @@ const WeeklyPage = ({user}) => {
         title="WeekPlanr"
         user={user}
         showHome={true}
-        rightButtonText="Edit Events"
+        rightButtonText="Add Events"
         onRightButtonClick={() => navigate("/monthly")}
         onHomeClick={() => navigate("/")}
       />

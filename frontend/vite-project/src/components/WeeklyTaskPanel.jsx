@@ -78,7 +78,7 @@ const WeeklyTaskPanel = ({
       <div className="task-list-header">
         <span className="task-index">#</span>
         <span className="task-name">Name</span>
-        <span className="task-check-label">Planned?</span>
+        <span className="task-check-label">Scheduled</span>
       </div>
 
       <div className="task-list" onDragOver={(e) => e.preventDefault()}>

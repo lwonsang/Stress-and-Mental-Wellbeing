@@ -89,8 +89,9 @@ const getCalendarCells = (
   totalDays = 30,
   onAddClick,
   events = [],
-  onDayClick,
-  taskDates = new Set()
+  taskDates = new Set(),
+  onEditClick,
+  onDeleteEvent
 ) => {
   const cells = [];
 
@@ -118,10 +119,12 @@ const getCalendarCells = (
       <Grid.Col span={1} key={day}>
         <DayCell
           dayNumber={day}
-          events={eventDisplay}
+          eventToDisplay={eventDisplay}
+          eventlist={events}
           onAddClick={onAddClick}
-          onDayClick={onDayClick}
           hasTasks={hasTask}
+          onEditClick={onEditClick}
+          onDeleteEvent={onDeleteEvent}
         />
       </Grid.Col>
     );
@@ -136,7 +139,6 @@ const Calendar = ({user}) => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [editingEvent, setEditingEvent] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
-
 
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
@@ -223,12 +225,22 @@ const Calendar = ({user}) => {
         onHomeClick={() => navigate("/")}
       />
 
-      <MonthSwitcher
-        month={months[date.getMonth()]}
-        year={date.getFullYear()}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
+      <div style={{justifyContent: 'center', display: 'flex', gap: '200px'}}>
+        <div style={{ flex: 1 }} />
+          <MonthSwitcher
+            month={months[date.getMonth()]}
+            year={date.getFullYear()}
+            onPrev={handlePrev}
+            onNext={handleNext}
+          />
+
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <button onClick={() => navigate("/weekly")}>
+            Switch to Weekly View
+          </button>
+        </div>
+      </div>
+      
       <Box style={{ width: "100%", padding: "1rem" }}>
         <div style={{ padding: 16 }}>
           <Grid columns={7} gutter="xs">
@@ -248,13 +260,21 @@ const Calendar = ({user}) => {
             daysInMonth,
             openModalForDay,
             visibleEvents,
-            (clickedDay) => {
-              const clickedDate = new Date(date.getFullYear(), date.getMonth(), clickedDay);
-              const formatted = clickedDate.toISOString().split("T")[0];
-              navigate("/weekly", { state: { selectedDate: formatted } });
+            taskDates,
+            (event) => {
+              setEditingEvent(event);
+              setSelectedDay(null);
+              setModalOpened(true);
             },
-            taskDates
+            (eventId) => {
+              const confirmDelete = window.confirm(`Delete event?`);
+              if (confirmDelete) {
+                setEvents((prev) => prev.filter((e) => e.id !== eventId));
+              }
+            }
           )}
+
+
           </Grid>
         </div>
       </Box>
@@ -268,14 +288,12 @@ const Calendar = ({user}) => {
         initialEvent={editingEvent}
         onCreate={(newEvent) => {
           if (editingEvent) {
-            // Update existing event
             setEvents(prev =>
               prev.map(e =>
                 e.id === editingEvent.id ? { ...newEvent, id: editingEvent.id } : e
               )
             );
           } else {
-            // Add new event
             setEvents((prev) => [
               ...prev,
               { ...newEvent, id: `e${prev.length + 1}` },
@@ -310,12 +328,12 @@ const Calendar = ({user}) => {
                 <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
                   <button
                      onClick={() => {
-                      setEditModalOpen(false); // 👈 close the list modal first
+                      setEditModalOpen(false);
                       setTimeout(() => {
                         setEditingEvent(event);
                         setSelectedDay(null);
                         setModalOpened(true);
-                      }, 0); // 👈 slight delay ensures the other modal unmounts before opening
+                      }, 0);
                     }}
                     style={{
                       backgroundColor: "#1976d2",

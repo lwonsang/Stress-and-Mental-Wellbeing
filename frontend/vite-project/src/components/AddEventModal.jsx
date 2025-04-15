@@ -104,7 +104,7 @@ export default function AddEventModal({
         />
 
         <TextInput
-          label="End Date:"
+          label="End repeat after:"
           type="date"
           value={endDate}
           onChange={(e) => setEndDate(e.currentTarget.value)}

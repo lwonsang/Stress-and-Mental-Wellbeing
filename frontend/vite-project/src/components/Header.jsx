@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 
@@ -7,12 +7,10 @@ const Header = ({
   user,
   showHome,
   onHomeClick,
-  monthButtonText,
-  rightButtonText,
-  onMonthButtonClick,
-  onRightButtonClick  
+  currentView
 }) => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -35,32 +33,44 @@ const Header = ({
           </button>
         )}
         <div className="header-title">{title}</div>
+
+        <div className="user-dropdown">
+          <button
+            className="user-toggle"
+            onClick={() => setShowMenu((prev) => !prev)}
+          >
+            Hi, {user.username} ⌄
+          </button>
+          {showMenu && (
+            <div className="dropdown-menu">
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
+        </div>
       </div>
-      
-      {user && (
-          <div className="header-user">
-            Hi, {user.username}
-          </div>
-      )}
-      
+
       <div className="header-right">
-        {monthButtonText && (
-          <button className="header-button" onClick={onMonthButtonClick}>
-            {monthButtonText}
-          </button>
-        )}
-        {rightButtonText && (
-          <button className="header-button" onClick={onRightButtonClick}>
-            {rightButtonText}
-          </button>
-        )}
-        <button
-          className="header-button"
-          onClick={handleLogout}
-          style={{ marginLeft: 8 }}
-        >
-          Logout
-        </button>
+        <div className="view-switcher-container">
+          <div className="view-switcher">
+            <button
+              className={`header-button ${currentView === "monthly" ? "active" : ""}`}
+              onClick={() => navigate("/monthly")}
+              title="Edit Events (Monthly View)"
+            >
+              Monthly
+            </button>
+            <button
+              className={`header-button ${currentView === "weekly" ? "active" : ""}`}
+              onClick={() => navigate("/weekly")}
+              title="Edit Tasks (Weekly View)"
+            >
+              Weekly
+            </button>
+          </div>
+          <div className="view-description">
+            Switch between event planning and task scheduling
+          </div>
+        </div>
       </div>
     </div>
   );

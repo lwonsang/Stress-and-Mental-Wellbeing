@@ -392,14 +392,15 @@ const WeeklyPage = ({ user }) => {
 
   return (
     <>
-      <Header
-        title="WeekPlanr"
-        user={user}
-        showHome={true}
-        rightButtonText="Add Events"
-        onRightButtonClick={() => navigate("/monthly")}
-        onHomeClick={() => navigate("/")}
-      />
+   <Header
+  title="WeekPlanr"
+  user={user}
+  showHome={true}
+  onHomeClick={() => navigate("/")}
+  currentView="weekly"
+/>
+
+
       <div className="weekly-layout">
         <WeeklyView
           initialDate={passedDate}
@@ -423,9 +424,9 @@ const WeeklyPage = ({ user }) => {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", marginBottom: "8px" }}>
-            <button className="fetch-button" onClick={() => navigate("/monthly")}>
+            {/* <button className="fetch-button" onClick={() => navigate("/monthly")}>
               Switch to Monthly View
-            </button>
+            </button> */}
             
             <button
               className="fetch-button"

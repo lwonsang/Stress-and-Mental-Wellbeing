@@ -299,13 +299,12 @@ const Home = ({ user }) => {
   return (
     <div className="home-page">
       <Header
-        title="WeekPlanr"
-        user={user}
-        monthButtonText="Add Events"
-        rightButtonText="Add Tasks & Edit Schedule"
-        onMonthButtonClick={() => navigate("/monthly")}
-        onRightButtonClick={() => navigate("/weekly")}
-      />
+  title="WeekPlanr"
+  user={user}
+  showHome={false}
+  currentView="" 
+/>
+
 
       <div className="home-main">
         <div className="readonly-section">

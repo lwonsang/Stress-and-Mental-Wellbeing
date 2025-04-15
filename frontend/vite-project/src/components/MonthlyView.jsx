@@ -218,12 +218,14 @@ const Calendar = ({user}) => {
 
   return (
     <>
-      <Header
-        title="WeekPlanr"
-        showHome={true}
-        user={user}
-        onHomeClick={() => navigate("/")}
-      />
+<Header
+  title="WeekPlanr"
+  user={user}
+  showHome={true}
+  onHomeClick={() => navigate("/")}
+  currentView="monthly"
+/>
+
 
       <div style={{justifyContent: 'center', display: 'flex', gap: '200px'}}>
         <div style={{ flex: 1 }} />
@@ -235,9 +237,9 @@ const Calendar = ({user}) => {
           />
 
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="fetch-button" onClick={() => navigate("/weekly")}>
+          {/* <button className="fetch-button" onClick={() => navigate("/weekly")}>
             Switch to Weekly View
-          </button>
+          </button> */}
         </div>
       </div>
       

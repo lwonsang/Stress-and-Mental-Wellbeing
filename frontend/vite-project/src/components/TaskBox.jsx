@@ -7,7 +7,14 @@ const TaskBox = ({ task, slot, onClick }) => {
   };
 
   const hours = parseFloat(task.workTime);
-  const height = Math.max(15, 28 * hours - 4) + "px";
+  const heightVal = Math.max(15, 28 * hours - 4);
+  const height = `${heightVal}px`;
+
+  const maxChars = 15;
+  const shouldTruncate = task.name.length > maxChars;
+  const displayName = shouldTruncate
+    ? task.name.slice(0, maxChars - 1) + "…"
+    : task.name;
 
   return (
     <div
@@ -30,11 +37,12 @@ const TaskBox = ({ task, slot, onClick }) => {
         overflow: "hidden",
       }}
     >
-      <div style={{ fontSize: "1rem", marginRight: "4px" }}>{task.name}</div>
-      {slot && (
+      <div style={{ fontSize: "1rem", marginRight: "4px" }}>{displayName}</div>
+      {/* {slot && (
         <div style={{ fontSize: "0.7rem", opacity: 0.8 }}>{slot.time}</div>
-      )}
+      )} */}
     </div>
   );
 };
+
 export default TaskBox;

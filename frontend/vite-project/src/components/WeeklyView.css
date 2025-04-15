@@ -118,6 +118,7 @@
   min-width: 300px;
   text-align: left;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color-scheme: light;
 }
 
 .task-modal-content h3 {
@@ -234,4 +235,24 @@
   position: relative;
   z-index: 1;
   overflow: hidden;
+}
+
+.task-modal-content option {
+  color: black;
+  background-color: white;
+}
+
+.fetch-button {
+  background-color: #cce0ff;
+  color: #003366;
+  border: 1px solid #99c2ff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fetch-button:hover {
+  background-color: #b3d1ff;
 }

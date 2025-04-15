@@ -27,28 +27,28 @@ const Home = ({ user }) => {
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     const defaultTasks = [
-      {
-        id: "t1",
-        name: "Learning",
-        duration: "3h",
-        workTime: "1h",
-        dueDate: "2025-04-30",
-        dueTime: "10:00",
-        slots: [
-          { date: "2025-04-07", time: "10:00" },
-          { date: "2025-04-08", time: "10:00" },
-          { date: "2025-04-09", time: "10:00" },
-        ],
-      },
-      {
-        id: "t2",
-        name: "Workout",
-        duration: "1h",
-        workTime: "1h",
-        dueDate: "2025-04-10",
-        dueTime: "18:00",
-        slots: [{ date: "2025-04-09", time: "18:00" }],
-      },
+      // {
+      //   id: "t1",
+      //   name: "Learning",
+      //   duration: "3h",
+      //   workTime: "1h",
+      //   dueDate: "2025-04-30",
+      //   dueTime: "10:00",
+      //   slots: [
+      //     { date: "2025-04-07", time: "10:00" },
+      //     { date: "2025-04-08", time: "10:00" },
+      //     { date: "2025-04-09", time: "10:00" },
+      //   ],
+      // },
+      // {
+      //   id: "t2",
+      //   name: "Workout",
+      //   duration: "1h",
+      //   workTime: "1h",
+      //   dueDate: "2025-04-10",
+      //   dueTime: "18:00",
+      //   slots: [{ date: "2025-04-09", time: "18:00" }],
+      // },
     ];
     const loadedTasks = storedTasks ? JSON.parse(storedTasks) : defaultTasks;
 
@@ -320,7 +320,7 @@ const Home = ({ user }) => {
                 const day = date.getDate();
                 return (
                   <div key={i} className="readonly-cell day-label">
-                    {days[i]+" "}
+                    {days[i] + " "}
                     {month}/{day}
                   </div>
                 );
@@ -364,28 +364,36 @@ const Home = ({ user }) => {
                         />
                       ))}
 
-                      {slotsAtTime.map((slot, i) => (
-                        <div
-                          key={i}
-                          className="readonly-task"
-                          onClick={() => {
-                            setSelectedSlot(slot);
-                            setShowModal(true);
-                          }}
-                          style={{
-                            height: `${
-                              28 * parseFloat(slot.workTime || "1")
-                            }px`,
-                            position: "absolute",
-                            top: `${i * 30}px`,
-                            left: 0,
-                            right: 0,
-                            zIndex: 1,
-                          }}
-                        >
-                          {slot.name}
-                        </div>
-                      ))}
+                      {slotsAtTime.map((slot, i) => {
+                        const maxChars = 12;
+                        const shouldTruncate = slot.name.length > maxChars;
+                        const displayName = shouldTruncate
+                          ? slot.name.slice(0, maxChars - 1) + "…"
+                          : slot.name;
+
+                        return (
+                          <div
+                            key={i}
+                            className="readonly-task"
+                            onClick={() => {
+                              setSelectedSlot(slot);
+                              setShowModal(true);
+                            }}
+                            style={{
+                              height: `${
+                                28 * parseFloat(slot.workTime || "1")
+                              }px`,
+                              position: "absolute",
+                              top: `${i * 30}px`,
+                              left: 0,
+                              right: 0,
+                              zIndex: 1,
+                            }}
+                          >
+                            {displayName}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}

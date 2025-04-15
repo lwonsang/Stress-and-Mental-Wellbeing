@@ -52,8 +52,6 @@ function expandEvents(events, currentMonth, currentYear) {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    console.log("start: ", start);
-
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const date = new Date(d);
 
@@ -228,7 +226,6 @@ const Calendar = ({user}) => {
 
 
       <div style={{justifyContent: 'center', display: 'flex', gap: '200px'}}>
-        <div style={{ flex: 1 }} />
           <MonthSwitcher
             month={months[date.getMonth()]}
             year={date.getFullYear()}

@@ -12,7 +12,7 @@ import EventBox from "./EventBox";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-const WeeklyPage = ({user}) => {
+const WeeklyPage = ({ user }) => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const navigate = useNavigate();
@@ -25,28 +25,28 @@ const WeeklyPage = ({user}) => {
     return saved
       ? JSON.parse(saved)
       : [
-          {
-            id: "t1",
-            name: "Learning",
-            duration: "3h",
-            workTime: "1h",
-            dueDate: "2025-04-30",
-            dueTime: "10:00",
-            slots: [
-              { date: "2025-04-07", time: "10:00" },
-              { date: "2025-04-08", time: "10:00" },
-              { date: "2025-04-09", time: "10:00" },
-            ],
-          },
-          {
-            id: "t2",
-            name: "Workout",
-            duration: "1h",
-            workTime: "1h",
-            dueDate: "2025-04-10",
-            dueTime: "18:00",
-            slots: [{ date: "2025-04-09", time: "18:00" }],
-          },
+          // {
+          //   id: "t1",
+          //   name: "Learning",
+          //   duration: "3h",
+          //   workTime: "1h",
+          //   dueDate: "2025-04-30",
+          //   dueTime: "10:00",
+          //   slots: [
+          //     { date: "2025-04-07", time: "10:00" },
+          //     { date: "2025-04-08", time: "10:00" },
+          //     { date: "2025-04-09", time: "10:00" },
+          //   ],
+          // },
+          // {
+          //   id: "t2",
+          //   name: "Workout",
+          //   duration: "1h",
+          //   workTime: "1h",
+          //   dueDate: "2025-04-10",
+          //   dueTime: "18:00",
+          //   slots: [{ date: "2025-04-09", time: "18:00" }],
+          // },
         ];
   });
 
@@ -58,33 +58,33 @@ const WeeklyPage = ({user}) => {
     return saved
       ? JSON.parse(saved)
       : [
-          {
-            id: "e1",
-            name: "Daily Meeting",
-            startTime: "10:00",
-            startDate: "2025-04-07",
-            endTime: "11:30",
-            endDate: "2025-04-11",
-            repeat: "daily",
-          },
-          {
-            id: "e2",
-            name: "Doctor Appointment",
-            startTime: "15:00",
-            startDate: "2025-04-08",
-            endTime: "16:00",
-            endDate: "2025-04-08",
-            repeat: "never",
-          },
-          {
-            id: "e3",
-            name: "Team Sync",
-            startTime: "09:00",
-            startDate: "2025-04-09",
-            endTime: "09:30",
-            endDate: "2025-04-30",
-            repeat: "weekly",
-          },
+          // {
+          //   id: "e1",
+          //   name: "Daily Meeting",
+          //   startTime: "10:00",
+          //   startDate: "2025-04-07",
+          //   endTime: "11:30",
+          //   endDate: "2025-04-11",
+          //   repeat: "daily",
+          // },
+          // {
+          //   id: "e2",
+          //   name: "Doctor Appointment",
+          //   startTime: "15:00",
+          //   startDate: "2025-04-08",
+          //   endTime: "16:00",
+          //   endDate: "2025-04-08",
+          //   repeat: "never",
+          // },
+          // {
+          //   id: "e3",
+          //   name: "Team Sync",
+          //   startTime: "09:00",
+          //   startDate: "2025-04-09",
+          //   endTime: "09:30",
+          //   endDate: "2025-04-30",
+          //   repeat: "weekly",
+          // },
         ];
   });
   useEffect(() => {
@@ -413,16 +413,73 @@ const WeeklyPage = ({user}) => {
           setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
         />
-        <WeeklyTaskPanel
-          tasks={tasks}
-          setTasks={setTasks}
-          setSelectedTask={setSelectedTask}
-          setShowModal={setShowModal}
-          setIsEditing={setIsEditing}
-          generateSchedule={generateSchedule}
-          setSelectedEvent={setSelectedEvent}
-          setShowEventModal={setShowEventModal}
-        />
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            marginRight: "12px",
+          }}
+        >
+          <button
+            className="fetch-button"
+            onClick={() => {
+              const canvasTasks = [
+                {
+                  id: "t1",
+                  name: "Math Problem",
+                  duration: "4h",
+                  workTime: "1h",
+                  dueDate: "2025-04-18",
+                  dueTime: "23:59",
+                  slots: [],
+                },
+                {
+                  id: "t2",
+                  name: "Biology HW",
+                  duration: "6h",
+                  workTime: "1h",
+                  dueDate: "2025-04-19",
+                  dueTime: "23:59",
+                  slots: [],
+                },
+                {
+                  id: "t3",
+                  name: "SE Lab",
+                  duration: "3h",
+                  workTime: "1h",
+                  dueDate: "2025-04-16",
+                  dueTime: "13:00",
+                  slots: [],
+                },
+                {
+                  id: "t4",
+                  name: "English Paper",
+                  duration: "6h",
+                  workTime: "2h",
+                  dueDate: "2025-04-18",
+                  dueTime: "10:00",
+                  slots: [],
+                },
+              ];
+              setTasks((prev) => [...prev, ...canvasTasks]);
+            }}
+          >
+            Fetch Tasks from Canvas
+          </button>
+
+          <WeeklyTaskPanel
+            tasks={tasks}
+            setTasks={setTasks}
+            setSelectedTask={setSelectedTask}
+            setShowModal={setShowModal}
+            setIsEditing={setIsEditing}
+            generateSchedule={generateSchedule}
+            setSelectedEvent={setSelectedEvent}
+            setShowEventModal={setShowEventModal}
+          />
+        </div>
 
         {showModal && selectedTask && (
           <div className="task-modal">

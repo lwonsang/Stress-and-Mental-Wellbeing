@@ -10,7 +10,7 @@ const TaskBox = ({ task, slot, onClick }) => {
   const heightVal = Math.max(15, 28 * hours - 4);
   const height = `${heightVal}px`;
 
-  const maxChars = 10;
+  const maxChars = 15;
   const shouldTruncate = task.name.length > maxChars;
   const displayName = shouldTruncate
     ? task.name.slice(0, maxChars - 1) + "…"
@@ -38,9 +38,9 @@ const TaskBox = ({ task, slot, onClick }) => {
       }}
     >
       <div style={{ fontSize: "1rem", marginRight: "4px" }}>{displayName}</div>
-      {slot && (
+      {/* {slot && (
         <div style={{ fontSize: "0.7rem", opacity: 0.8 }}>{slot.time}</div>
-      )}
+      )} */}
     </div>
   );
 };

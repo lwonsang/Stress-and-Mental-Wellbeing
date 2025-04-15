@@ -241,3 +241,18 @@
   color: black;
   background-color: white;
 }
+
+.fetch-button {
+  background-color: #cce0ff;
+  color: #003366;
+  border: 1px solid #99c2ff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.fetch-button:hover {
+  background-color: #b3d1ff;
+}

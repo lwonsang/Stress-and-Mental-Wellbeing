@@ -27,28 +27,28 @@ const Home = ({ user }) => {
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
     const defaultTasks = [
-      {
-        id: "t1",
-        name: "Learning",
-        duration: "3h",
-        workTime: "1h",
-        dueDate: "2025-04-30",
-        dueTime: "10:00",
-        slots: [
-          { date: "2025-04-07", time: "10:00" },
-          { date: "2025-04-08", time: "10:00" },
-          { date: "2025-04-09", time: "10:00" },
-        ],
-      },
-      {
-        id: "t2",
-        name: "Workout",
-        duration: "1h",
-        workTime: "1h",
-        dueDate: "2025-04-10",
-        dueTime: "18:00",
-        slots: [{ date: "2025-04-09", time: "18:00" }],
-      },
+      // {
+      //   id: "t1",
+      //   name: "Learning",
+      //   duration: "3h",
+      //   workTime: "1h",
+      //   dueDate: "2025-04-30",
+      //   dueTime: "10:00",
+      //   slots: [
+      //     { date: "2025-04-07", time: "10:00" },
+      //     { date: "2025-04-08", time: "10:00" },
+      //     { date: "2025-04-09", time: "10:00" },
+      //   ],
+      // },
+      // {
+      //   id: "t2",
+      //   name: "Workout",
+      //   duration: "1h",
+      //   workTime: "1h",
+      //   dueDate: "2025-04-10",
+      //   dueTime: "18:00",
+      //   slots: [{ date: "2025-04-09", time: "18:00" }],
+      // },
     ];
     const loadedTasks = storedTasks ? JSON.parse(storedTasks) : defaultTasks;
 

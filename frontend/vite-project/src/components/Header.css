@@ -64,8 +64,10 @@
 .view-switcher-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center; 
+  transform: translateX(-15px); 
 }
+
 
 .logout-wrapper {
   display: flex;

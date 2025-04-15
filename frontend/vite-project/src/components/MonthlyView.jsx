@@ -225,20 +225,15 @@ const Calendar = ({user}) => {
 />
 
 
-      <div style={{justifyContent: 'center', display: 'flex', gap: '200px'}}>
-          <MonthSwitcher
-            month={months[date.getMonth()]}
-            year={date.getFullYear()}
-            onPrev={handlePrev}
-            onNext={handleNext}
-          />
+<div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
+  <MonthSwitcher
+    month={months[date.getMonth()]}
+    year={date.getFullYear()}
+    onPrev={handlePrev}
+    onNext={handleNext}
+  />
+</div>
 
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          {/* <button className="fetch-button" onClick={() => navigate("/weekly")}>
-            Switch to Weekly View
-          </button> */}
-        </div>
-      </div>
       
       <Box style={{ width: "100%", padding: "1rem" }}>
         <div style={{ padding: 16 }}>

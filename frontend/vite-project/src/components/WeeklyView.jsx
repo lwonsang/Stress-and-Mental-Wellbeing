@@ -422,7 +422,11 @@ const WeeklyPage = ({ user }) => {
             paddingLeft: "12px",
           }}
         >
-          <div style={{ alignSelf: "flex-end", marginBottom: "8px" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", marginBottom: "8px" }}>
+            <button className="fetch-button" onClick={() => navigate("/monthly")}>
+              Switch to Monthly View
+            </button>
+            
             <button
               className="fetch-button"
               onClick={() => {

@@ -235,7 +235,7 @@ const Calendar = ({user}) => {
           />
 
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <button onClick={() => navigate("/weekly")}>
+          <button className="fetch-button" onClick={() => navigate("/weekly")}>
             Switch to Weekly View
           </button>
         </div>

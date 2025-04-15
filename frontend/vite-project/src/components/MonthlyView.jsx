@@ -52,8 +52,6 @@ function expandEvents(events, currentMonth, currentYear) {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    console.log("start: ", start);
-
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
       const date = new Date(d);
 
@@ -221,24 +219,19 @@ const Calendar = ({user}) => {
       <Header
         title="WeekPlanr"
         showHome={true}
-        user={user}
+        user={user}        
         onHomeClick={() => navigate("/")}
+        rightButtonText="Add Tasks & Edit Schedule"
+        onRightButtonClick={() => navigate("/weekly")}
       />
 
       <div style={{justifyContent: 'center', display: 'flex', gap: '200px'}}>
-        <div style={{ flex: 1 }} />
           <MonthSwitcher
             month={months[date.getMonth()]}
             year={date.getFullYear()}
             onPrev={handlePrev}
             onNext={handleNext}
           />
-
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="fetch-button" onClick={() => navigate("/weekly")}>
-            Switch to Weekly View
-          </button>
-        </div>
       </div>
       
       <Box style={{ width: "100%", padding: "1rem" }}>

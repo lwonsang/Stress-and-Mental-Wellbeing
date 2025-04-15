@@ -422,21 +422,23 @@ const Home = ({ user }) => {
               ))}
             </ul>
           </div>
-          <div className="task-list-panel unplanned-panel">
-            <div className="task-list-title">Unplanned Tasks</div>
-            <ul className="task-list">
-              {tasks
-                .filter((t) => !t.slots || t.slots.length === 0)
-                .map((task) => (
-                  <li key={task.id} className="task-list-item unplanned-item">
-                    <span className="task-name">{task.name}</span>
-                    <span className="task-time">
-                      {task.dueDate} {task.dueTime}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-          </div>
+          {tasks.some((t) => !t.slots || t.slots.length === 0) && (
+            <div className="task-list-panel unplanned-panel">
+              <div className="task-list-title">Unplanned Tasks</div>
+              <ul className="task-list">
+                {tasks
+                  .filter((t) => !t.slots || t.slots.length === 0)
+                  .map((task) => (
+                    <li key={task.id} className="task-list-item unplanned-item">
+                      <span className="task-name">{task.name}</span>
+                      <span className="task-time">
+                        {task.dueDate} {task.dueTime}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
       {showEventModal && selectedEvent && (

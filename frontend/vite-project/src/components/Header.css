@@ -17,13 +17,25 @@
 }
 
 .home-icon {
-  background: none;
-  border: none;
+  background-color: #4d94ff;
   color: white;
-  font-size: 22px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
-  padding: 0;
+  font-weight: bold;
+  font-size: 14px;
+  margin-right: 6px;
+  margin-left: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
+
+.home-icon:hover {
+  background-color: #1a75ff;
+}
+
 
 .header-title {
   font-size: 20px;

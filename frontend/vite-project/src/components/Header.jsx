@@ -14,18 +14,20 @@ const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
   return (
     <div className="home-header">
       <div className="header-left">
-        {showHome && (
-          <button className="home-icon" onClick={onHomeClick} title="Go Home">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="white"
-            >
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-            </svg>
-          </button>
-        )}
+      {showHome && (
+  <button className="home-icon" onClick={onHomeClick} title="Go Home">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+    </svg>
+    <span>Home</span>
+  </button>
+)}
+
         <div className="header-title">{title}</div>
 
         <div className="user-dropdown">

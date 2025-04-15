@@ -2,13 +2,7 @@ import React, { useState } from "react";
 import "./Header.css";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({
-  title,
-  user,
-  showHome,
-  onHomeClick,
-  currentView
-}) => {
+const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -53,14 +47,18 @@ const Header = ({
         <div className="view-switcher-container">
           <div className="view-switcher">
             <button
-              className={`header-button ${currentView === "monthly" ? "active" : ""}`}
+              className={`header-button ${
+                currentView === "monthly" ? "active" : ""
+              }`}
               onClick={() => navigate("/monthly")}
               title="Edit Events (Monthly View)"
             >
               Monthly
             </button>
             <button
-              className={`header-button ${currentView === "weekly" ? "active" : ""}`}
+              className={`header-button ${
+                currentView === "weekly" ? "active" : ""
+              }`}
               onClick={() => navigate("/weekly")}
               title="Edit Tasks (Weekly View)"
             >

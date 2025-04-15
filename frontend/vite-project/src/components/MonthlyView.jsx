@@ -5,7 +5,7 @@ import { MonthSwitcher } from "./Monthswitch";
 import Header from "./Header";
 import AddEventModal from "./AddEventModal";
 import { useNavigate } from "react-router-dom";
-import { IconPencil } from '@tabler/icons-react';
+import { IconPencil } from "@tabler/icons-react";
 
 const months = [
   "Jan",
@@ -131,7 +131,7 @@ const getCalendarCells = (
   return cells;
 };
 
-const Calendar = ({user}) => {
+const Calendar = ({ user }) => {
   const [date, setDate] = useState(new Date());
   const [modalOpened, setModalOpened] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -142,21 +142,21 @@ const Calendar = ({user}) => {
     const saved = localStorage.getItem("tasks");
     return saved ? JSON.parse(saved) : [];
   });
-  
+
   const taskDates = new Set(
-    tasks.flatMap(t => 
-      (t.slots || []).map(s => {
+    tasks.flatMap((t) =>
+      (t.slots || []).map((s) => {
         const d = new Date(s.date);
-        return d.toISOString().split("T")[0]; 
+        return d.toISOString().split("T")[0];
       })
     )
   );
 
   const parseYmd = (str) => {
     const [y, m, d] = str.split("-").map(Number);
-    return new Date(y, m - 1, d); 
+    return new Date(y, m - 1, d);
   };
-  
+
   const [events, setEvents] = useState(() => {
     const saved = localStorage.getItem("events");
     return saved
@@ -186,7 +186,7 @@ const Calendar = ({user}) => {
       startDate: formatYmd(e.startDate),
       endDate: formatYmd(e.endDate),
     }));
-  
+
     localStorage.setItem("events", JSON.stringify(eventsForStorage));
   }, [events]);
 
@@ -216,25 +216,25 @@ const Calendar = ({user}) => {
 
   return (
     <>
-<Header
-  title="WeekPlanr"
-  user={user}
-  showHome={true}
-  onHomeClick={() => navigate("/")}
-  currentView="monthly"
-/>
+      <Header
+        title="WeekPlanr"
+        user={user}
+        showHome={true}
+        onHomeClick={() => navigate("/")}
+        currentView="monthly"
+      />
 
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}
+      >
+        <MonthSwitcher
+          month={months[date.getMonth()]}
+          year={date.getFullYear()}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
+      </div>
 
-<div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
-  <MonthSwitcher
-    month={months[date.getMonth()]}
-    year={date.getFullYear()}
-    onPrev={handlePrev}
-    onNext={handleNext}
-  />
-</div>
-
-      
       <Box style={{ width: "100%", padding: "1rem" }}>
         <div style={{ padding: 16 }}>
           <Grid columns={7} gutter="xs">
@@ -248,27 +248,25 @@ const Calendar = ({user}) => {
           </Grid>
 
           <Grid columns={7} gutter="xs">
-          {getCalendarCells(
-            firstDayOfMonth,
-            firstDayOfMonth.getDay(),
-            daysInMonth,
-            openModalForDay,
-            visibleEvents,
-            taskDates,
-            (event) => {
-              setEditingEvent(event);
-              setSelectedDay(null);
-              setModalOpened(true);
-            },
-            (eventId) => {
-              const confirmDelete = window.confirm(`Delete event?`);
-              if (confirmDelete) {
-                setEvents((prev) => prev.filter((e) => e.id !== eventId));
+            {getCalendarCells(
+              firstDayOfMonth,
+              firstDayOfMonth.getDay(),
+              daysInMonth,
+              openModalForDay,
+              visibleEvents,
+              taskDates,
+              (event) => {
+                setEditingEvent(event);
+                setSelectedDay(null);
+                setModalOpened(true);
+              },
+              (eventId) => {
+                const confirmDelete = window.confirm(`Delete event?`);
+                if (confirmDelete) {
+                  setEvents((prev) => prev.filter((e) => e.id !== eventId));
+                }
               }
-            }
-          )}
-
-
+            )}
           </Grid>
         </div>
       </Box>
@@ -282,9 +280,11 @@ const Calendar = ({user}) => {
         initialEvent={editingEvent}
         onCreate={(newEvent) => {
           if (editingEvent) {
-            setEvents(prev =>
-              prev.map(e =>
-                e.id === editingEvent.id ? { ...newEvent, id: editingEvent.id } : e
+            setEvents((prev) =>
+              prev.map((e) =>
+                e.id === editingEvent.id
+                  ? { ...newEvent, id: editingEvent.id }
+                  : e
               )
             );
           } else {
@@ -300,11 +300,12 @@ const Calendar = ({user}) => {
       />
       {editModalOpen && (
         <div className="task-modal">
-          <div className="task-modal-content"
+          <div
+            className="task-modal-content"
             style={{
               maxHeight: "70vh",
               overflowY: "auto",
-              paddingRight: "12px"
+              paddingRight: "12px",
             }}
           >
             <h3>Edit Events</h3>
@@ -312,16 +313,24 @@ const Calendar = ({user}) => {
             {events.length === 0 && <p>No events yet.</p>}
 
             {events.map((event, index) => (
-              <div key={event.id || index} style={{ marginBottom: "12px", borderBottom: "1px solid #ccc", paddingBottom: "8px" }}>
+              <div
+                key={event.id || index}
+                style={{
+                  marginBottom: "12px",
+                  borderBottom: "1px solid #ccc",
+                  paddingBottom: "8px",
+                }}
+              >
                 <strong>{event.name}</strong>
                 <p>
-                  {formatYmd(event.startDate)} {event.startTime} — {formatYmd(event.endDate)} {event.endTime}
+                  {formatYmd(event.startDate)} {event.startTime} —{" "}
+                  {formatYmd(event.endDate)} {event.endTime}
                 </p>
                 <p>Repeat: {event.repeat}</p>
 
                 <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
                   <button
-                     onClick={() => {
+                    onClick={() => {
                       setEditModalOpen(false);
                       setTimeout(() => {
                         setEditingEvent(event);
@@ -343,9 +352,11 @@ const Calendar = ({user}) => {
 
                   <button
                     onClick={() => {
-                      const confirmDelete = window.confirm(`Delete event "${event.name}"?`);
+                      const confirmDelete = window.confirm(
+                        `Delete event "${event.name}"?`
+                      );
                       if (confirmDelete) {
-                        setEvents(prev => prev.filter((e, i) => i !== index));
+                        setEvents((prev) => prev.filter((e, i) => i !== index));
                       }
                     }}
                     style={{
@@ -382,11 +393,11 @@ const Calendar = ({user}) => {
           size={64}
           onClick={() => setEditModalOpen(true)}
           style={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 48,
             right: 48,
             zIndex: 1000,
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
           }}
         >
           <IconPencil size={22} />

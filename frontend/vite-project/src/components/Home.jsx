@@ -298,13 +298,7 @@ const Home = ({ user }) => {
 
   return (
     <div className="home-page">
-      <Header
-  title="WeekPlanr"
-  user={user}
-  showHome={false}
-  currentView="" 
-/>
-
+      <Header title="WeekPlanr" user={user} showHome={false} currentView="" />
 
       <div className="home-main">
         <div className="readonly-section">

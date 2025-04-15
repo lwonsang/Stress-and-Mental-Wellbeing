@@ -1,5 +1,6 @@
-body {
-  background-color: white;
+html, body {
+  background-color: white !important;
+  color-scheme: light;
 }
 
 #root {

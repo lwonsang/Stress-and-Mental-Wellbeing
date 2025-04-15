@@ -235,3 +235,8 @@
   z-index: 1;
   overflow: hidden;
 }
+
+.task-modal-content option {
+  color: black;
+  background-color: white;
+}

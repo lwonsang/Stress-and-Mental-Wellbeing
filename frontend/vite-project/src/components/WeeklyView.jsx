@@ -416,69 +416,71 @@ const WeeklyPage = ({ user }) => {
 
         <div
           style={{
+            flex: 1,
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-end",
-            marginRight: "12px",
+            paddingLeft: "12px",
           }}
         >
-          <button
-            className="fetch-button"
-            onClick={() => {
-              const canvasTasks = [
-                {
-                  id: "t1",
-                  name: "Math Problem",
-                  duration: "4h",
-                  workTime: "1h",
-                  dueDate: "2025-04-18",
-                  dueTime: "23:59",
-                  slots: [],
-                },
-                {
-                  id: "t2",
-                  name: "Biology HW",
-                  duration: "6h",
-                  workTime: "1h",
-                  dueDate: "2025-04-19",
-                  dueTime: "23:59",
-                  slots: [],
-                },
-                {
-                  id: "t3",
-                  name: "SE Lab",
-                  duration: "3h",
-                  workTime: "1h",
-                  dueDate: "2025-04-16",
-                  dueTime: "13:00",
-                  slots: [],
-                },
-                {
-                  id: "t4",
-                  name: "English Paper",
-                  duration: "6h",
-                  workTime: "2h",
-                  dueDate: "2025-04-18",
-                  dueTime: "10:00",
-                  slots: [],
-                },
-              ];
+          <div style={{ alignSelf: "flex-end", marginBottom: "8px" }}>
+            <button
+              className="fetch-button"
+              onClick={() => {
+                const canvasTasks = [
+                  {
+                    id: "t1",
+                    name: "Math Problem",
+                    duration: "4h",
+                    workTime: "1h",
+                    dueDate: "2025-04-18",
+                    dueTime: "23:59",
+                    slots: [],
+                  },
+                  {
+                    id: "t2",
+                    name: "Biology HW",
+                    duration: "6h",
+                    workTime: "1h",
+                    dueDate: "2025-04-19",
+                    dueTime: "23:59",
+                    slots: [],
+                  },
+                  {
+                    id: "t3",
+                    name: "SE Lab",
+                    duration: "3h",
+                    workTime: "1h",
+                    dueDate: "2025-04-16",
+                    dueTime: "13:00",
+                    slots: [],
+                  },
+                  {
+                    id: "t4",
+                    name: "English Paper",
+                    duration: "6h",
+                    workTime: "2h",
+                    dueDate: "2025-04-18",
+                    dueTime: "10:00",
+                    slots: [],
+                  },
+                ];
 
-              setTasks((prev) => {
-                const existingIds = new Set(prev.map((t) => t.id));
-                const filtered = canvasTasks.filter(
-                  (t) => !existingIds.has(t.id)
-                );
-                if (filtered.length === 0) {
-                  alert("No new tasks to add.");
-                  return prev;
-                }
-                return [...prev, ...filtered];
-              });
-            }}
-          >
-            Fetch Tasks from Canvas
-          </button>
+                setTasks((prev) => {
+                  const existingIds = new Set(prev.map((t) => t.id));
+                  const filtered = canvasTasks.filter(
+                    (t) => !existingIds.has(t.id)
+                  );
+                  if (filtered.length === 0) {
+                    alert("No new tasks to add.");
+                    return prev;
+                  }
+                  return [...prev, ...filtered];
+                });
+              }}
+            >
+              Fetch Tasks from Canvas
+            </button>
+          </div>
 
           <WeeklyTaskPanel
             tasks={tasks}

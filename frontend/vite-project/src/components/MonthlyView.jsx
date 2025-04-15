@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Box, Grid, Text } from "@mantine/core";
+import { Box, Grid, Text, ActionIcon, Tooltip } from "@mantine/core";
 import { DayCell } from "./DayCell";
 import { MonthSwitcher } from "./Monthswitch";
 import Header from "./Header";
 import AddEventModal from "./AddEventModal";
 import { useNavigate } from "react-router-dom";
+import { IconPencil } from '@tabler/icons-react';
 
 const months = [
   "Jan",
@@ -220,8 +221,6 @@ const Calendar = ({user}) => {
         showHome={true}
         user={user}
         onHomeClick={() => navigate("/")}
-        rightButtonText="Edit Existing Events"
-        onRightButtonClick={() => setEditModalOpen(true)}
       />
 
       <MonthSwitcher
@@ -362,6 +361,25 @@ const Calendar = ({user}) => {
           </div>
         </div>
       )}
+
+      <Tooltip label="Edit Events" position="left" offset={8}>
+        <ActionIcon
+          variant="filled"
+          color="blue"
+          radius="xl"
+          size={64}
+          onClick={() => setEditModalOpen(true)}
+          style={{
+            position: 'fixed',
+            bottom: 48,
+            right: 48,
+            zIndex: 1000,
+            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+          }}
+        >
+          <IconPencil size={22} />
+        </ActionIcon>
+      </Tooltip>
     </>
   );
 };

@@ -959,7 +959,7 @@ const WeeklyView = ({
   };
 
   return (
-    <div className="weekly-container">
+    <div className="weekly-container draggable">
       <div className="weekly-header">
         <button className="nav-btn" onClick={handlePrev}>
           {"<"}
@@ -969,7 +969,7 @@ const WeeklyView = ({
           {">"}
         </button>
       </div>
-
+      
       <div className="weekly-grid">
         <div className="time-column">
           <div className="day-header empty-cell"></div>

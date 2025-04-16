@@ -147,3 +147,8 @@
   font-style: italic;
   opacity: 0.9;
 }
+
+.task-list-item:hover {
+  cursor: pointer;
+  background-color: #f0f0f5;
+}

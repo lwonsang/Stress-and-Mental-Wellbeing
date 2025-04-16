@@ -119,3 +119,14 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+.task-box, .task-list-item {
+  cursor: grab;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-box:hover, .task-list-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+

@@ -88,6 +88,7 @@ const getCalendarCells = (
   onAddClick,
   events = [],
   taskDates = new Set(),
+  fullEvents = [],
   onEditClick,
   onDeleteEvent
 ) => {
@@ -118,7 +119,7 @@ const getCalendarCells = (
         <DayCell
           dayNumber={day}
           eventToDisplay={eventDisplay}
-          eventlist={events}
+          events={fullEvents}
           onAddClick={onAddClick}
           hasTasks={hasTask}
           onEditClick={onEditClick}
@@ -255,6 +256,7 @@ const Calendar = ({ user }) => {
               openModalForDay,
               visibleEvents,
               taskDates,
+              events,
               (event) => {
                 setEditingEvent(event);
                 setSelectedDay(null);
@@ -385,24 +387,52 @@ const Calendar = ({ user }) => {
         </div>
       )}
 
-      <Tooltip label="Edit Events" position="left" offset={8}>
-        <ActionIcon
-          variant="filled"
-          color="blue"
-          radius="xl"
-          size={64}
-          onClick={() => setEditModalOpen(true)}
-          style={{
-            position: "fixed",
-            bottom: 48,
-            right: 48,
-            zIndex: 1000,
-            boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-          }}
-        >
-          <IconPencil size={22} />
-        </ActionIcon>
-      </Tooltip>
+      <div
+        style={{
+          position: "fixed",
+          top: 72,
+          right: 24,
+          display: "flex",
+          flexDirection: "row",
+          gap: "16px",
+          zIndex: 1000,
+        }}
+      >
+        <Tooltip label="Add Event" position="bottom" offset={8}>
+          <ActionIcon
+            variant="filled"
+            color="green"
+            radius="xl"
+            size={64}
+            onClick={() => {
+              setSelectedDay(null);
+              setModalOpened(true);
+            }}
+            style={{
+              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%" }}>
+              <span style={{ fontSize: 24, fontWeight: "bold", lineHeight: 1 }}>+</span>
+            </div>
+          </ActionIcon>
+        </Tooltip>
+
+        <Tooltip label="Edit Events" position="bottom" offset={8}>
+          <ActionIcon
+            variant="filled"
+            color="blue"
+            radius="xl"
+            size={64}
+            onClick={() => setEditModalOpen(true)}
+            style={{
+              boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+            }}
+          >
+            <IconPencil size={32} />
+          </ActionIcon>
+        </Tooltip>
+      </div>
     </>
   );
 };

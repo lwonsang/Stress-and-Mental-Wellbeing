@@ -140,14 +140,21 @@ export default function AddEventModal({
               fontSize: "1.1rem",
             }}
             onClick={() => {
+              if (!eventType || !startDate || !startTime || !endTime || !repeat) {
+                alert("Please fill out all fields.");
+                return;
+              }
+              
+              const finalEndDate = endDate || "2025-05-01";
+
               const eventData = {
                 name: eventName || eventType,
                 startDate: new Date(startDate + "T00:00"),
-                endDate: new Date(endDate + "T00:00"),
+                endDate: new Date(finalEndDate + "T00:00"),
                 startTime,
                 endTime,
                 repeat,
-                ...(initialEvent?.id && { id: initialEvent.id }) 
+                ...(initialEvent?.id && { id: initialEvent.id })
               };
               onCreate(eventData);
               onClose();

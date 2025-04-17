@@ -1,9 +1,11 @@
 import { Paper, Text, Button} from '@mantine/core';
+import { IconPencil } from "@tabler/icons-react";
 import { useState } from 'react';
 
 export function DayCell({
   dayNumber,
   eventToDisplay = [],
+  events = [],
   onAddClick,
   hasTasks,
   onEditClick,
@@ -18,22 +20,6 @@ export function DayCell({
     const day = String(dateObj.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
-  
-  const parseYmd = (str) => {
-    const [y, m, d] = str.split("-").map(Number);
-    return new Date(y, m - 1, d); 
-  };
-  
-  const [events, setEvents] = useState(() => {
-    const saved = localStorage.getItem("events");
-    return saved
-      ? JSON.parse(saved).map((e) => ({
-          ...e,
-          startDate: parseYmd(e.startDate),
-          endDate: parseYmd(e.endDate),
-        }))
-      : [];
-  });
 
   return (
     <Paper
@@ -113,7 +99,7 @@ export function DayCell({
                 setEditModalOpen(true)
               }}
             >
-              ...
+              <IconPencil size={22} />
             </Button>
             
           </div>

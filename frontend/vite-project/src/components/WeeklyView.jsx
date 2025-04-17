@@ -615,24 +615,44 @@ const WeeklyPage = ({ user }) => {
                 ))}
               </select>
 
-              <label>Work Time Duration:</label>
-              <select
-                value={selectedTask.workTime}
-                onChange={(e) =>
-                  setSelectedTask({ ...selectedTask, workTime: e.target.value })
-                }
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "8px",
+                  fontSize: "16px",
+                  fontWeight: "normal",
+                }}
               >
-                <option value="" disabled hidden>
-                  I want to work on this for __ hours at once
-                </option>
-                {generateOptions(
-                  selectedTask.duration ? parseFloat(selectedTask.duration) : 10
-                ).map((w) => (
-                  <option key={w} value={w}>
-                    {w}
-                  </option>
-                ))}
-              </select>
+                <label htmlFor="workTimeSelect" style={{ marginBottom: 0 }}>
+                  I want to work on for
+                </label>
+                <select
+                  id="workTimeSelect"
+                  value={selectedTask.workTime}
+                  onChange={(e) =>
+                    setSelectedTask({ ...selectedTask, workTime: e.target.value })
+                  }
+                  style={{
+                    fontSize: "16px",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    backgroundColor: "white",
+                    width: "100px",
+                  }}
+                >
+                  {generateOptions(
+                    selectedTask.duration ? parseFloat(selectedTask.duration) : 10
+                  ).map((w) => (
+                    <option key={w} value={w}>
+                      {w}
+                    </option>
+                  ))}
+                </select>
+                <span>hours</span>
+              </div>
 
               <label>Due Date:</label>
               <input

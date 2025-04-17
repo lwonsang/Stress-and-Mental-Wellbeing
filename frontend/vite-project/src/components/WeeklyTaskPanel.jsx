@@ -76,6 +76,9 @@ const WeeklyTaskPanel = ({
       <div className="task-panel-header">This Week's Tasks</div>
 
       <div className="task-list-header">
+        <span className="drag-handle" style={{ visibility: "hidden" }}>
+          ☰
+        </span>
         <span className="task-index">#</span>
         <span className="task-name">Name</span>
         <span className="task-check-label">Scheduled</span>
@@ -92,8 +95,23 @@ const WeeklyTaskPanel = ({
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
           >
+            <span className="drag-handle">☰</span>
+
             <span className="task-index">{index + 1}</span>
-            <span className="task-name">{task.name}</span>
+            <span
+              className="task-name clickable"
+              onClick={() => {
+                setSelectedTask({
+                  ...task,
+                  selectedSlot: null,
+                  dueDate: task.dueDate?.slice(0, 10) || "",
+                });
+                setIsEditing(false);
+                setShowModal(true);
+              }}
+            >
+              {task.name}
+            </span>
             <span className="task-edit" onClick={() => handleEdit(task)}>
               ✎
             </span>

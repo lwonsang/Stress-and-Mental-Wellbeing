@@ -38,7 +38,16 @@
   margin: 5px 0;
   background-color: #e6e6ff;
   cursor: grab;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.task-row:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.task-row:hover .drag-handle {
+  color: #333;
 }
 
 .task-row.drag-over {
@@ -66,7 +75,7 @@
 }
 
 .task-edit {
-  width: 60px;
+  width: 80px;
   text-align: center;
   cursor: pointer;
   color: #3333cc;
@@ -130,4 +139,12 @@
 .draggable .task-list-item:hover {
   transform: scale(1.02);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.drag-handle {
+  cursor: grab;
+  margin-right: 8px;
+  color: #666;
+  user-select: none;
+  font-size: 18px;
 }

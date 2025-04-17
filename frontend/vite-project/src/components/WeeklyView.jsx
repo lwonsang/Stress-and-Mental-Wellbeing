@@ -20,6 +20,16 @@ const WeeklyPage = ({ user }) => {
   const passedDateStr = location.state?.selectedDate;
   const passedDate = passedDateStr ? new Date(passedDateStr) : new Date();
 
+  const onClickTask = (task, slot = null) => {
+    setSelectedTask({
+      ...task,
+      selectedSlot: slot,
+      dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
+    });
+    setIsEditing(false);
+    setShowModal(true);
+  };
+
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
     return saved
@@ -462,7 +472,7 @@ const WeeklyPage = ({ user }) => {
                     name: "SE Lab",
                     duration: "3h",
                     workTime: "1h",
-                    dueDate: "2025-04-16",
+                    dueDate: "2025-04-18",
                     dueTime: "13:00",
                     slots: [],
                   },
@@ -503,6 +513,7 @@ const WeeklyPage = ({ user }) => {
             generateSchedule={generateSchedule}
             setSelectedEvent={setSelectedEvent}
             setShowEventModal={setShowEventModal}
+            onClickTask={onClickTask}
           />
         </div>
 
@@ -538,7 +549,15 @@ const WeeklyPage = ({ user }) => {
                   }}
                 >
                   Close
-                </button>{" "}
+                </button>
+                <button
+                  className="modal-button submit-btn"
+                  onClick={() => {
+                    setIsEditing(true);
+                  }}
+                >
+                  Edit
+                </button>
               </div>
             </div>
           </div>
@@ -632,7 +651,10 @@ const WeeklyPage = ({ user }) => {
                   id="workTimeSelect"
                   value={selectedTask.workTime}
                   onChange={(e) =>
-                    setSelectedTask({ ...selectedTask, workTime: e.target.value })
+                    setSelectedTask({
+                      ...selectedTask,
+                      workTime: e.target.value,
+                    })
                   }
                   style={{
                     fontSize: "16px",
@@ -644,7 +666,9 @@ const WeeklyPage = ({ user }) => {
                   }}
                 >
                   {generateOptions(
-                    selectedTask.duration ? parseFloat(selectedTask.duration) : 10
+                    selectedTask.duration
+                      ? parseFloat(selectedTask.duration)
+                      : 10
                   ).map((w) => (
                     <option key={w} value={w}>
                       {w}
@@ -969,7 +993,7 @@ const WeeklyView = ({
     );
   };
 
-  const onClickTask = (task, slot) => {
+  const onClickTask = (task, slot = null) => {
     setSelectedTask({
       ...task,
       selectedSlot: slot,
@@ -989,7 +1013,7 @@ const WeeklyView = ({
           {">"}
         </button>
       </div>
-      
+
       <div className="weekly-grid">
         <div className="time-column">
           <div className="day-header empty-cell"></div>

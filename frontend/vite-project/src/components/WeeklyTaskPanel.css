@@ -74,12 +74,31 @@
   padding-left: 8px;
 }
 
-.task-edit {
+/* .task-edit {
   width: 80px;
   text-align: center;
   cursor: pointer;
   color: #3333cc;
+} */
+
+.task-edit {
+  background-color: #1a00ff;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-right: 40px;
+
 }
+
+.task-edit:hover {
+  background-color: #0000cc;
+  transform: scale(1.05);
+}
+
 
 .task-check {
   width: 24px;

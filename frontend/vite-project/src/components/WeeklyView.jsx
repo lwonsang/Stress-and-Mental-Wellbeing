@@ -531,14 +531,7 @@ const WeeklyPage = ({ user }) => {
                 <strong>Due:</strong> {selectedTask.dueDate}{" "}
                 {selectedTask.dueTime}
               </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {selectedTask.selectedSlot?.date || "N/A"}
-              </p>
-              <p>
-                <strong>Time Slot:</strong>{" "}
-                {selectedTask.selectedSlot?.time || "N/A"}
-              </p>
+        
 
               <div className="modal-buttons">
                 <button

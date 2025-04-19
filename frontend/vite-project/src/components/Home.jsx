@@ -303,7 +303,10 @@ const Home = ({ user }) => {
       <div className="home-main">
         <div className="readonly-section">
           <div className="section-title">This Week's Schedule</div>
-
+          <p className="readonly-hint">
+            🔒 This is a read-only overview. To add or edit events, use Monthly
+            View; to manage tasks, use Weekly View.
+          </p>
           <div className="readonly-grid">
             <div className="readonly-row">
               <div className="readonly-cell empty-cell" />

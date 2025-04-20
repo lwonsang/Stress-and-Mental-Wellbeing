@@ -170,7 +170,7 @@
 .view-switcher-bar {
   display: flex;
   justify-content: center;
-  margin: 8px 0 4px 0; 
+  margin: 8px 0 4px 0;
 }
 
 .switch-group {
@@ -273,12 +273,15 @@
   border-radius: 50%;
 }
 
-.event-dot {
+.task-dot {
   background-color: #1a237e;
 }
-
-.task-dot {
-  background-color: #e53935;
+.monthly-task-item.task-item {
+  background-color: #8ea3f0;
+}
+.monthly-task-item.task-item:hover {
+  background-color: #d0d7ff;
+  box-shadow: 0 0 0 2px #1a237e;
 }
 
 .monthly-task-panel {
@@ -318,22 +321,15 @@
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.monthly-task-item.event-item:hover {
-  background-color: #d0d5f5;
-  box-shadow: 0 0 0 2px #5c6bc0;
+.event-dot {
+  background-color: #90caf9;
 }
-
-.monthly-task-item.task-item:hover {
-  background-color: #ffd9d9;
-  box-shadow: 0 0 0 2px #e53935;
-}
-
 .monthly-task-item.event-item {
-  background-color: #e8eaf6;
+  background-color: #e3f2fd;
 }
-
-.monthly-task-item.task-item {
-  background-color: #ffe6e6;
+.monthly-task-item.event-item:hover {
+  background-color: #bbdefb;
+  box-shadow: 0 0 0 2px #64b5f6;
 }
 
 .monthly-task-name {
@@ -381,13 +377,11 @@
 }
 .section-header {
   display: flex;
-  align-items: center; /* 关键！让按钮和文字垂直居中对齐 */
+  align-items: center; 
   justify-content: center;
-  gap: 12px; /* 可选：按钮和标题的间距 */
+  gap: 12px; 
   margin: 16px 0;
-  
 }
-
 
 .nav-button {
   display: flex;
@@ -411,5 +405,5 @@
   font-weight: bold;
   font-size: 18px;
   color: blue;
-  transform: translateY(6px); 
+  transform: translateY(6px);
 }

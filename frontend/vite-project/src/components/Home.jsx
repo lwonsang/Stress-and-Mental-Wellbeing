@@ -606,27 +606,11 @@ const Home = ({ user }) => {
             }}
           >
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span
-                className="event-dot"
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "50%",
-                  backgroundColor: "#1a237e",
-                }}
-              ></span>
+              <span className="event-dot" />
               <span style={{ fontSize: "14px", color: "#333" }}>Event</span>
             </span>
             <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span
-                className="task-dot"
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "50%",
-                  backgroundColor: "#e53935",
-                }}
-              ></span>
+              <span className="task-dot" />
               <span style={{ fontSize: "14px", color: "#333" }}>Task</span>
             </span>
           </div>

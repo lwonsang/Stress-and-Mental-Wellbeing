@@ -751,6 +751,16 @@ const Home = ({ user }) => {
               >
                 Close
               </button>
+              <button
+                className="modal-button submit-btn"
+                onClick={() =>
+                  navigate("/monthly", {
+                    state: { selectedDate: selectedEvent.date },
+                  })
+                }
+              >
+                Edit
+              </button>
             </div>
           </div>
         </div>

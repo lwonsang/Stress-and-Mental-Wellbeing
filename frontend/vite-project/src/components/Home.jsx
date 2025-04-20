@@ -696,34 +696,56 @@ const Home = ({ user }) => {
                 </li>
               ))}
 
-              {tasksForSelectedDay.map((t, i) => (
-                <li
-                  key={`task-${i}`}
-                  className="monthly-task-item task-item"
-                  onClick={() => {
-                    const slot = (t.slots || []).find(
-                      (s) => s.date === selectedDateStr
-                    );
-                    if (slot) {
-                      setSelectedSlot({
-                        ...slot,
-                        name: t.name,
-                        taskId: t.id,
-                        duration: t.duration,
-                        workTime: t.workTime,
-                        dueDate: t.dueDate,
-                        dueTime: t.dueTime,
-                      });
-                      setShowModal(true);
-                    }
-                  }}
-                >
-                  <span className="monthly-task-name">{t.name}</span>
-                  <span className="monthly-task-time">
-                    {t.dueDate} {t.dueTime}
-                  </span>
-                </li>
-              ))}
+              {tasksForSelectedDay.map((t, i) => {
+                const slot = (t.slots || []).find(
+                  (s) => s.date === selectedDateStr
+                );
+                const fullSlot = slot
+                  ? { ...slot, workTime: t.workTime }
+                  : null;
+
+                return (
+                  <li
+                    key={`task-${i}`}
+                    className="monthly-task-item task-item"
+                    onClick={() => {
+                      if (fullSlot) {
+                        setSelectedSlot({
+                          ...fullSlot,
+                          name: t.name,
+                          taskId: t.id,
+                          duration: t.duration,
+                          dueDate: t.dueDate,
+                          dueTime: t.dueTime,
+                        });
+                        setShowModal(true);
+                      }
+                    }}
+                  >
+                    <span className="monthly-task-name">{t.name}</span>
+                    <span className="monthly-task-time">
+                      {(() => {
+                        if (!fullSlot || !fullSlot.time) return "";
+
+                        const [h, m] = fullSlot.time.split(":").map(Number);
+                        const raw = String(fullSlot.workTime || "1");
+                        const hours =
+                          parseFloat(raw.replace(/[^\d.]/g, "")) || 1;
+
+                        const totalMin = h * 60 + m + hours * 60;
+                        const endH = Math.floor(totalMin / 60) % 24;
+                        const endM = totalMin % 60;
+
+                        const endStr = `${String(endH).padStart(
+                          2,
+                          "0"
+                        )}:${String(endM).padStart(2, "0")}`;
+                        return `${fullSlot.time} ~ ${endStr}`;
+                      })()}
+                    </span>
+                  </li>
+                );
+              })}
             </div>
           </div>
         </>

@@ -59,12 +59,16 @@ const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
                 setShowUserMenu(false);
               }}
             >
-              ＋ Add
+              ＋ Manage
             </button>
             {showAddMenu && (
               <div className="add-dropdown-menu">
-                <button onClick={() => navigate("/monthly")}>Add Event</button>
-                <button onClick={() => navigate("/weekly")}>Add Task</button>
+                <button onClick={() => navigate("/monthly")}>
+                  Manage Events
+                </button>
+                <button onClick={() => navigate("/weekly")}>
+                  Manage Tasks
+                </button>
               </div>
             )}
           </div>

@@ -680,72 +680,71 @@ const Home = ({ user }) => {
                 Tasks & Events on {selectedDateStr}
               </div>
 
-              {eventsForSelectedDay.map((e, i) => (
-                <li
-                  key={`event-${i}`}
-                  className="monthly-task-item event-item"
-                  onClick={() => {
-                    setSelectedEvent(e);
-                    setShowEventModal(true);
-                  }}
-                >
-                  <span className="monthly-task-name">{e.name}</span>
-                  <span className="monthly-task-time">
-                    {e.time} ~ {e.endTime}
-                  </span>
-                </li>
-              ))}
-
-              {tasksForSelectedDay.map((t, i) => {
-                const slot = (t.slots || []).find(
-                  (s) => s.date === selectedDateStr
-                );
-                const fullSlot = slot
-                  ? { ...slot, workTime: t.workTime }
-                  : null;
-
-                return (
+              {[
+                ...eventsForSelectedDay.map((e) => ({
+                  type: "event",
+                  name: e.name,
+                  time: e.time,
+                  endTime: e.endTime,
+                  data: e,
+                })),
+                ...tasksForSelectedDay.map((t) => {
+                  const slot = (t.slots || []).find(
+                    (s) => s.date === selectedDateStr
+                  );
+                  if (!slot) return null;
+                  return {
+                    type: "task",
+                    name: t.name,
+                    time: slot.time,
+                    workTime: t.workTime,
+                    data: {
+                      ...slot,
+                      name: t.name,
+                      taskId: t.id,
+                      duration: t.duration,
+                      dueDate: t.dueDate,
+                      dueTime: t.dueTime,
+                    },
+                  };
+                }),
+              ]
+                .filter(Boolean)
+                .sort((a, b) => a.time.localeCompare(b.time))
+                .map((item, i) => (
                   <li
-                    key={`task-${i}`}
-                    className="monthly-task-item task-item"
+                    key={`${item.type}-${i}`}
+                    className={`monthly-task-item ${item.type}-item`}
                     onClick={() => {
-                      if (fullSlot) {
-                        setSelectedSlot({
-                          ...fullSlot,
-                          name: t.name,
-                          taskId: t.id,
-                          duration: t.duration,
-                          dueDate: t.dueDate,
-                          dueTime: t.dueTime,
-                        });
+                      if (item.type === "event") {
+                        setSelectedEvent(item.data);
+                        setShowEventModal(true);
+                      } else {
+                        setSelectedSlot(item.data);
                         setShowModal(true);
                       }
                     }}
                   >
-                    <span className="monthly-task-name">{t.name}</span>
+                    <span className="monthly-task-name">{item.name}</span>
                     <span className="monthly-task-time">
-                      {(() => {
-                        if (!fullSlot || !fullSlot.time) return "";
-
-                        const [h, m] = fullSlot.time.split(":").map(Number);
-                        const raw = String(fullSlot.workTime || "1");
-                        const hours =
-                          parseFloat(raw.replace(/[^\d.]/g, "")) || 1;
-
-                        const totalMin = h * 60 + m + hours * 60;
-                        const endH = Math.floor(totalMin / 60) % 24;
-                        const endM = totalMin % 60;
-
-                        const endStr = `${String(endH).padStart(
-                          2,
-                          "0"
-                        )}:${String(endM).padStart(2, "0")}`;
-                        return `${fullSlot.time} ~ ${endStr}`;
-                      })()}
+                      {item.type === "event"
+                        ? `${item.time} ~ ${item.endTime}`
+                        : (() => {
+                            const [h, m] = item.time.split(":").map(Number);
+                            const raw = String(item.workTime || "1");
+                            const hours =
+                              parseFloat(raw.replace(/[^\d.]/g, "")) || 1;
+                            const totalMin = h * 60 + m + hours * 60;
+                            const endH = Math.floor(totalMin / 60) % 24;
+                            const endM = totalMin % 60;
+                            return `${item.time} ~ ${String(endH).padStart(
+                              2,
+                              "0"
+                            )}:${String(endM).padStart(2, "0")}`;
+                          })()}
                     </span>
                   </li>
-                );
-              })}
+                ))}
             </div>
           </div>
         </>

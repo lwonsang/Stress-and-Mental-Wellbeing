@@ -18,11 +18,60 @@ const getStartOfWeek = () => {
 
 const Home = ({ user }) => {
   const [tasks, setTasks] = useState([]);
-  const [weekStart] = useState(getStartOfWeek());
+  const [weekStart, setWeekStart] = useState(getStartOfWeek());
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [eventSlots, setEventSlots] = useState([]);
   const navigate = useNavigate();
+  const [activeView, setActiveView] = useState("weekly");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const toDateStr = (date) => date.toLocaleDateString("en-CA");
+  const selectedDateStr = toDateStr(selectedDate);
+
+  const tasksForSelectedDay = tasks.filter((task) =>
+    (task.slots || []).some((slot) => slot.date === selectedDateStr)
+  );
+
+  const eventsForSelectedDay = eventSlots.filter(
+    (event) => event.date === selectedDateStr
+  );
+
+  const currentYear = selectedDate.getFullYear();
+  const currentMonth = selectedDate.getMonth();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+  const startDayIndex = firstDayOfMonth.getDay();
+
+  const calendarDays = [];
+
+  for (let i = 0; i < startDayIndex; i++) {
+    calendarDays.push(
+      <div key={`empty-${i}`} className="calendar-cell empty-cell" />
+    );
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const dateStr = date.toISOString().split("T")[0];
+    const hasTask = tasks.some((task) =>
+      (task.slots || []).some((slot) => slot.date === dateStr)
+    );
+    const hasEvent = eventSlots.some((e) => e.date === dateStr);
+
+    calendarDays.push(
+      <div
+        key={d}
+        className={`calendar-cell ${
+          selectedDateStr === dateStr ? "selected" : ""
+        }`}
+        onClick={() => setSelectedDate(date)}
+      >
+        <div className="calendar-day">{d}</div>
+        {hasTask && <div className="dot task-dot" />}
+        {hasEvent && <div className="dot event-dot" />}
+      </div>
+    );
+  }
 
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks");
@@ -225,7 +274,7 @@ const Home = ({ user }) => {
     console.log(
       `[AutoSizedEvent] Rendering "${event.name}" with duration: ${
         event.duration
-      }, computed height: ${28 * parseFloat(event.duration || 1)}px`
+      }, computed height: ${24 * parseFloat(event.duration || 1)}px`
     );
 
     return (
@@ -242,7 +291,7 @@ const Home = ({ user }) => {
           textAlign: "center",
           backgroundColor: "#e3e9ff",
           color: "#1a237e",
-          height: `${28 * parseFloat(event.duration || 1)}px`,
+          height: `${24 * parseFloat(event.duration || 1)}px`,
           position: "absolute",
           top: `${index * 30}px`,
           left: 0,
@@ -286,157 +335,395 @@ const Home = ({ user }) => {
     }))
   );
 
+  const handlePrev = () => {
+    if (activeView === "weekly") {
+      const prevWeek = new Date(weekStart);
+      prevWeek.setDate(prevWeek.getDate() - 7);
+      setWeekStart(prevWeek);
+    } else if (activeView === "monthly") {
+      const prevMonth = new Date(selectedDate);
+      prevMonth.setMonth(prevMonth.getMonth() - 1);
+      setSelectedDate(prevMonth);
+    }
+  };
+
+  const handleNext = () => {
+    if (activeView === "weekly") {
+      const nextWeek = new Date(weekStart);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      setWeekStart(nextWeek);
+    } else if (activeView === "monthly") {
+      const nextMonth = new Date(selectedDate);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      setSelectedDate(nextMonth);
+    }
+  };
+
   const sortedSlots = [...allSlots].sort(
     (a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`)
   );
 
   const now = new Date();
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 7);
+
   const upcomingSlots = sortedSlots.filter((slot) => {
     const slotDateTime = new Date(`${slot.date}T${slot.time}`);
-    return slotDateTime >= now;
+    return slotDateTime >= now && slotDateTime < weekEnd;
   });
 
   return (
     <div className="home-page">
       <Header title="WeekPlanr" user={user} showHome={false} currentView="" />
 
-      <div className="home-main">
-        <div className="readonly-section">
-          <div className="section-title">This Week's Schedule</div>
-          <p className="readonly-hint">
-            🔒 This is a read-only overview. To add or edit events, use Monthly
-            View; to manage tasks, use Weekly View.
-          </p>
-          <div className="readonly-grid">
-            <div className="readonly-row">
-              <div className="readonly-cell empty-cell" />
-              {dateList.map((dateStr, i) => {
-                const date = new Date(dateStr);
-                const month = date.getMonth() + 1;
-                const day = date.getDate();
-                return (
-                  <div key={i} className="readonly-cell day-label">
-                    {days[i] + " "}
-                    {month}/{day}
+      <div className="view-switcher-bar">
+        <div className="switch-group">
+          <div className="switch-buttons">
+            <button
+              className={`switch-tab ${
+                activeView === "weekly" ? "active" : ""
+              }`}
+              onClick={() => setActiveView("weekly")}
+            >
+              Weekly
+            </button>
+            <button
+              className={`switch-tab ${
+                activeView === "monthly" ? "active" : ""
+              }`}
+              onClick={() => setActiveView("monthly")}
+            >
+              Monthly
+            </button>
+          </div>
+          <div className="switch-hint">🔒 This is a read-only overview.</div>
+        </div>
+      </div>
+
+      {activeView === "weekly" && (
+        <>
+          <div className="section-header">
+            <button className="nav-button" onClick={handlePrev}>
+              ◀
+            </button>
+            <div className="section-title">
+              {`Week of ${weekStart.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}`}
+            </div>
+            <button className="nav-button" onClick={handleNext}>
+              ▶
+            </button>
+          </div>
+          <div className="home-main">
+            <div className="readonly-section">
+              <div className="readonly-grid">
+                <div className="readonly-row">
+                  <div className="readonly-cell empty-cell" />
+                  {dateList.map((dateStr, i) => {
+                    const date = new Date(dateStr);
+                    const month = date.getMonth() + 1;
+                    const day = date.getDate();
+                    return (
+                      <div key={i} className="readonly-cell day-label">
+                        {days[i] + " "}
+                        {month}/{day}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {hours.map((hour, hIdx) => (
+                  <div key={hIdx} className="readonly-row">
+                    <div className="readonly-cell time-label">{hour}</div>
+
+                    {dateList.map((date, dIdx) => {
+                      const parseTime = (timeStr) => {
+                        const [h, m] = timeStr.split(":").map(Number);
+                        return h * 60 + m;
+                      };
+
+                      const eventsAtTime = eventSlots.filter((e) => {
+                        if (e.date !== date) return false;
+                        const slotMin = parseTime(hour);
+                        const eventMin = parseTime(e.time);
+                        return Math.abs(eventMin - slotMin) <= 30;
+                      });
+
+                      const slotsAtTime = allSlots.filter(
+                        (s) => s.date === date && s.time === hour
+                      );
+
+                      return (
+                        <div
+                          key={dIdx}
+                          className="readonly-cell task-slot"
+                          style={{ position: "relative" }}
+                        >
+                          {eventsAtTime.map((event, i) => (
+                            <AutoSizedEvent
+                              key={event.id + i}
+                              event={event}
+                              index={i}
+                              onClick={(e) => {
+                                setSelectedEvent(e);
+                                setShowEventModal(true);
+                              }}
+                            />
+                          ))}
+
+                          {slotsAtTime.map((slot, i) => {
+                            const maxChars = 12;
+                            const shouldTruncate = slot.name.length > maxChars;
+                            const displayName = shouldTruncate
+                              ? slot.name.slice(0, maxChars - 1) + "…"
+                              : slot.name;
+
+                            return (
+                              <div
+                                key={i}
+                                className="readonly-task"
+                                onClick={() => {
+                                  setSelectedSlot(slot);
+                                  setShowModal(true);
+                                }}
+                                style={{
+                                  height: `${
+                                    24 * parseFloat(slot.workTime || "1")
+                                  }px`,
+                                  position: "absolute",
+                                  top: `${i * 30}px`,
+                                  left: 0,
+                                  right: 0,
+                                  zIndex: 1,
+                                }}
+                              >
+                                {displayName}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
 
-            {hours.map((hour, hIdx) => (
-              <div key={hIdx} className="readonly-row">
-                <div className="readonly-cell time-label">{hour}</div>
+            <div className="task-panels">
+              <div className="task-list-panel">
+                <div className="task-list-title">Upcoming Tasks</div>
+                <ul className="task-list">
+                  {upcomingSlots.length === 0 ? (
+                    <li className="task-list-item" style={{ opacity: 0.6 }}>
+                      No tasks this week.
+                    </li>
+                  ) : (
+                    upcomingSlots.map((slot) => (
+                      <li
+                        key={slot.taskId + "-" + slot.date + "-" + slot.time}
+                        className="task-list-item"
+                        onClick={() => {
+                          setSelectedSlot(slot);
+                          setShowModal(true);
+                        }}
+                      >
+                        <span className="task-name">{slot.name}</span>
+                        <span className="task-time">
+                          {slot.date} {slot.time}
+                        </span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
 
-                {dateList.map((date, dIdx) => {
-                  const parseTime = (timeStr) => {
-                    const [h, m] = timeStr.split(":").map(Number);
-                    return h * 60 + m;
-                  };
+              {tasks.some((t) => !t.slots || t.slots.length === 0) && (
+                <div className="task-list-panel unplanned-panel">
+                  <div className="task-list-title">Unplanned Tasks</div>
+                  <ul className="task-list">
+                    {tasks
+                      .filter((t) => !t.slots || t.slots.length === 0)
+                      .map((task) => (
+                        <li
+                          key={task.id}
+                          className="task-list-item unplanned-item"
+                        >
+                          <span className="task-name">{task.name}</span>
+                          <span className="task-time">
+                            Due: {task.dueDate} {task.dueTime}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>{" "}
+        </>
+      )}
+      {activeView === "monthly" && (
+        <>
+          <div className="section-header">
+            <button className="nav-button" onClick={handlePrev}>
+              ◀
+            </button>
+            <div className="section-title">
+              {activeView === "weekly"
+                ? `Week of ${weekStart.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}`
+                : `${new Date(currentYear, currentMonth).toLocaleString(
+                    "en-US",
+                    {
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )}`}
+            </div>
+            <button className="nav-button" onClick={handleNext}>
+              ▶
+            </button>
+          </div>
 
-                  const eventsAtTime = eventSlots.filter((e) => {
-                    if (e.date !== date) return false;
-                    const slotMin = parseTime(hour);
-                    const eventMin = parseTime(e.time);
-                    return Math.abs(eventMin - slotMin) <= 30;
-                  });
-                  const slotsAtTime = allSlots.filter(
-                    (s) => s.date === date && s.time === hour
-                  );
+          <div
+            className="monthly-legend"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginLeft: "20px",
+              marginTop: "8px",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span
+                className="event-dot"
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: "#1a237e",
+                }}
+              ></span>
+              <span style={{ fontSize: "14px", color: "#333" }}>Event</span>
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <span
+                className="task-dot"
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  backgroundColor: "#e53935",
+                }}
+              ></span>
+              <span style={{ fontSize: "14px", color: "#333" }}>Task</span>
+            </span>
+          </div>
+
+          <div className="monthly-content">
+            <div className="monthly-grid">
+              {days.map((d) => (
+                <div key={d} className="monthly-day-label">
+                  {d}
+                </div>
+              ))}
+
+              {Array(firstDayOfMonth.getDay())
+                .fill(null)
+                .map((_, i) => (
+                  <div key={`empty-${i}`} className="monthly-day-cell empty" />
+                ))}
+
+              {Array(daysInMonth)
+                .fill(null)
+                .map((_, i) => {
+                  const day = i + 1;
+                  const dateKey = `${currentYear}-${String(
+                    currentMonth + 1
+                  ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                  const isSelected = selectedDateStr === dateKey;
                   return (
                     <div
-                      key={dIdx}
-                      className="readonly-cell task-slot"
-                      style={{ position: "relative" }}
+                      key={day}
+                      className={`monthly-day-cell ${
+                        isSelected ? "selected" : ""
+                      }`}
+                      onClick={() => setSelectedDate(new Date(dateKey))}
                     >
-                      {eventsAtTime.map((event, i) => (
-                        <AutoSizedEvent
-                          key={event.id + i}
-                          event={event}
-                          index={i}
-                          onClick={(e) => {
-                            setSelectedEvent(e);
-                            setShowEventModal(true);
-                          }}
-                        />
-                      ))}
-
-                      {slotsAtTime.map((slot, i) => {
-                        const maxChars = 12;
-                        const shouldTruncate = slot.name.length > maxChars;
-                        const displayName = shouldTruncate
-                          ? slot.name.slice(0, maxChars - 1) + "…"
-                          : slot.name;
-
-                        return (
-                          <div
-                            key={i}
-                            className="readonly-task"
-                            onClick={() => {
-                              setSelectedSlot(slot);
-                              setShowModal(true);
-                            }}
-                            style={{
-                              height: `${
-                                28 * parseFloat(slot.workTime || "1")
-                              }px`,
-                              position: "absolute",
-                              top: `${i * 30}px`,
-                              left: 0,
-                              right: 0,
-                              zIndex: 1,
-                            }}
-                          >
-                            {displayName}
-                          </div>
-                        );
-                      })}
+                      <div className="day-number">{day}</div>
+                      <div className="dot-bar">
+                        {eventSlots.some((e) => e.date === dateKey) && (
+                          <span className="event-dot" />
+                        )}
+                        {tasks.some((t) =>
+                          (t.slots || []).some((s) => s.date === dateKey)
+                        ) && <span className="task-dot" />}
+                      </div>
                     </div>
                   );
                 })}
+            </div>
+
+            <div className="monthly-task-panel">
+              <div className="monthly-task-list-title">
+                Tasks & Events on {selectedDateStr}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="task-panels">
-          <div className="task-list-panel ">
-            <div className="task-list-title">Upcoming Tasks</div>
-            <ul className="task-list">
-              {upcomingSlots.map((slot, idx) => (
+
+              {eventsForSelectedDay.map((e, i) => (
                 <li
-                  key={slot.taskId + "-" + slot.date + "-" + slot.time}
-                  className="task-list-item"
+                  key={`event-${i}`}
+                  className="monthly-task-item event-item"
                   onClick={() => {
-                    setSelectedSlot(slot);
-                    setShowModal(true);
+                    setSelectedEvent(e);
+                    setShowEventModal(true);
                   }}
                 >
-                  <span className="task-name">{slot.name}</span>
-                  <span className="task-time">
-                    {slot.date} {slot.time}
+                  <span className="monthly-task-name">{e.name}</span>
+                  <span className="monthly-task-time">
+                    {e.time} ~ {e.endTime}
                   </span>
                 </li>
               ))}
-            </ul>
-          </div>
-          {tasks.some((t) => !t.slots || t.slots.length === 0) && (
-            <div className="task-list-panel unplanned-panel">
-              <div className="task-list-title">Unplanned Tasks</div>
-              <ul className="task-list">
-                {tasks
-                  .filter((t) => !t.slots || t.slots.length === 0)
-                  .map((task) => (
-                    <li key={task.id} className="task-list-item unplanned-item">
-                      <span className="task-name">{task.name}</span>
-                      <span className="task-time">
-                        {task.dueDate} {task.dueTime}
-                      </span>
-                    </li>
-                  ))}
-              </ul>
+
+              {tasksForSelectedDay.map((t, i) => (
+                <li
+                  key={`task-${i}`}
+                  className="monthly-task-item task-item"
+                  onClick={() => {
+                    const slot = (t.slots || []).find(
+                      (s) => s.date === selectedDateStr
+                    );
+                    if (slot) {
+                      setSelectedSlot({
+                        ...slot,
+                        name: t.name,
+                        taskId: t.id,
+                        duration: t.duration,
+                        workTime: t.workTime,
+                        dueDate: t.dueDate,
+                        dueTime: t.dueTime,
+                      });
+                      setShowModal(true);
+                    }
+                  }}
+                >
+                  <span className="monthly-task-name">{t.name}</span>
+                  <span className="monthly-task-time">
+                    {t.dueDate} {t.dueTime}
+                  </span>
+                </li>
+              ))}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
+
       {showEventModal && selectedEvent && (
         <div className="task-modal">
           <div className="task-modal-content">
@@ -498,11 +785,11 @@ const Home = ({ user }) => {
               </button>
               <button
                 className="modal-button submit-btn"
-                onClick={() => {
+                onClick={() =>
                   navigate("/weekly", {
                     state: { selectedDate: selectedSlot.date },
-                  });
-                }}
+                  })
+                }
               >
                 Edit
               </button>

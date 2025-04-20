@@ -1,6 +1,6 @@
 const EventBox = ({ event, onClick }) => {
   const hours = parseFloat(event.duration || 1);
-  const height = `${28 * hours - 4}px`;
+  const height = `${24 * hours - 4}px`;
 
   const maxLength = 14;
   const displayName =

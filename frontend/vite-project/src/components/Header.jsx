@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
   const navigate = useNavigate();
-  const [showMenu, setShowMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showAddMenu, setShowAddMenu] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -33,11 +34,14 @@ const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
         <div className="user-dropdown">
           <button
             className="user-toggle"
-            onClick={() => setShowMenu((prev) => !prev)}
+            onClick={() => {
+              setShowUserMenu((prev) => !prev);
+              setShowAddMenu(false);
+            }}
           >
             Hi, {user.username} ⌄
           </button>
-          {showMenu && (
+          {showUserMenu && (
             <div className="dropdown-menu">
               <button onClick={handleLogout}>Logout</button>
             </div>
@@ -46,28 +50,40 @@ const Header = ({ title, user, showHome, onHomeClick, currentView }) => {
       </div>
 
       <div className="header-right">
-        <div className="view-switcher-container">
-          <div className="view-switcher">
+        {currentView === "" && (
+          <div className="add-dropdown">
             <button
-              className={`header-button ${
-                currentView === "monthly" ? "active" : ""
-              }`}
-              onClick={() => navigate("/monthly")}
-              title="Edit Events (Monthly View)"
+              className="add-button"
+              onClick={() => {
+                setShowAddMenu((prev) => !prev);
+                setShowUserMenu(false);
+              }}
             >
-              Events (Monthly)
+              ＋ Add
             </button>
-            <button
-              className={`header-button ${
-                currentView === "weekly" ? "active" : ""
-              }`}
-              onClick={() => navigate("/weekly")}
-              title="Edit Tasks (Weekly View)"
-            >
-              Tasks (Weekly)
-            </button>
+            {showAddMenu && (
+              <div className="add-dropdown-menu">
+                <button onClick={() => navigate("/monthly")}>Add Event</button>
+                <button onClick={() => navigate("/weekly")}>Add Task</button>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {currentView === "monthly" && (
+          <button className="header-button" onClick={() => navigate("/weekly")}>
+            Manage Tasks
+          </button>
+        )}
+
+        {currentView === "weekly" && (
+          <button
+            className="header-button"
+            onClick={() => navigate("/monthly")}
+          >
+            Manage Events
+          </button>
+        )}
       </div>
     </div>
   );

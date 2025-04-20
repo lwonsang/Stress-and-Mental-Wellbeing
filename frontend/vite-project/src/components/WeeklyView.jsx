@@ -261,7 +261,6 @@ const WeeklyPage = ({ user }) => {
 
     const now = new Date();
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - startDate.getDay());
 
     const used = new Set();
 
@@ -454,7 +453,7 @@ const WeeklyPage = ({ user }) => {
                     name: "Math Problem",
                     duration: "4h",
                     workTime: "1h",
-                    dueDate: "2025-04-18",
+                    dueDate: "2025-04-22",
                     dueTime: "23:59",
                     slots: [],
                   },
@@ -463,7 +462,7 @@ const WeeklyPage = ({ user }) => {
                     name: "Biology HW",
                     duration: "6h",
                     workTime: "1h",
-                    dueDate: "2025-04-19",
+                    dueDate: "2025-04-23",
                     dueTime: "23:59",
                     slots: [],
                   },
@@ -472,7 +471,7 @@ const WeeklyPage = ({ user }) => {
                     name: "SE Lab",
                     duration: "3h",
                     workTime: "1h",
-                    dueDate: "2025-04-18",
+                    dueDate: "2025-04-24",
                     dueTime: "13:00",
                     slots: [],
                   },
@@ -481,7 +480,7 @@ const WeeklyPage = ({ user }) => {
                     name: "English Paper",
                     duration: "6h",
                     workTime: "2h",
-                    dueDate: "2025-04-18",
+                    dueDate: "2025-04-23",
                     dueTime: "10:00",
                     slots: [],
                   },

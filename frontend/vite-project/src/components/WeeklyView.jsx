@@ -530,7 +530,6 @@ const WeeklyPage = ({ user }) => {
                 <strong>Due:</strong> {selectedTask.dueDate}{" "}
                 {selectedTask.dueTime}
               </p>
-        
 
               <div className="modal-buttons">
                 <button
@@ -580,6 +579,16 @@ const WeeklyPage = ({ user }) => {
                   onClick={() => setShowEventModal(false)}
                 >
                   Close
+                </button>
+                <button
+                  className="modal-button submit-btn"
+                  onClick={() => {
+                    navigate("/monthly", {
+                      state: { selectedDate: selectedEvent.date },
+                    });
+                  }}
+                >
+                  Edit
                 </button>
               </div>
             </div>

@@ -16,6 +16,11 @@ const getStartOfWeek = () => {
   return now;
 };
 
+const safeParseDate = (dateStr) => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const Home = ({ user }) => {
   const [tasks, setTasks] = useState([]);
   const [weekStart, setWeekStart] = useState(getStartOfWeek());
@@ -52,7 +57,7 @@ const Home = ({ user }) => {
 
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(currentYear, currentMonth, d);
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = toDateStr(date);
     const hasTask = tasks.some((task) =>
       (task.slots || []).some((slot) => slot.date === dateStr)
     );
@@ -147,7 +152,7 @@ const Home = ({ user }) => {
           let segmentDate = new Date(current);
 
           while (remainingMin > 0) {
-            const segmentDateStr = segmentDate.toISOString().split("T")[0];
+            const segmentDateStr = toDateStr(segmentDate);
             const segmentStartHour = Math.floor(dayStartMin / 60);
             const segmentStartMin = dayStartMin % 60;
             const segmentTime = `${segmentStartHour
@@ -318,7 +323,7 @@ const Home = ({ user }) => {
     Array.from({ length: 7 }, (_, i) => {
       const d = new Date(weekStart);
       d.setDate(d.getDate() + i);
-      return d.toISOString().split("T")[0];
+      return toDateStr(d);
     });
 
   const dateList = getDatesOfWeek();
@@ -423,7 +428,7 @@ const Home = ({ user }) => {
                 <div className="readonly-row">
                   <div className="readonly-cell empty-cell" />
                   {dateList.map((dateStr, i) => {
-                    const date = new Date(dateStr);
+                    const date = safeParseDate(dateStr);
                     const month = date.getMonth() + 1;
                     const day = date.getDate();
                     return (
@@ -654,7 +659,7 @@ const Home = ({ user }) => {
                       className={`monthly-day-cell ${
                         isSelected ? "selected" : ""
                       }`}
-                      onClick={() => setSelectedDate(new Date(dateKey))}
+                      onClick={() => setSelectedDate(safeParseDate(dateKey))}
                     >
                       <div className="day-number">{day}</div>
                       <div className="dot-bar">

@@ -1014,7 +1014,17 @@ const WeeklyView = ({
           {">"}
         </button>
       </div>
-
+      <p
+        style={{
+          textAlign: "center",
+          marginTop: "-10px",
+          marginBottom: "8px",
+          fontSize: "14px",
+          color: "#555",
+        }}
+      >
+        💡 You can drag tasks to adjust their time slots.
+      </p>
       <div className="weekly-grid">
         <div className="time-column">
           <div className="day-header empty-cell"></div>

@@ -13,6 +13,8 @@ const EventBox = ({ event, onClick }) => {
       className="event-box"
       onClick={onClick}
       title={event.name}
+      draggable={false}
+      onDragStart={(e) => e.preventDefault()}
       style={{
         height,
         marginBottom: "4px",
